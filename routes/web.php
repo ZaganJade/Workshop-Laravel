@@ -17,6 +17,14 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Google OAuth Auth Routes
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
+// OTP Routes
+Route::get('/auth/otp', [AuthController::class, 'showOtpForm'])->name('auth.otp.form');
+Route::post('/auth/otp', [AuthController::class, 'verifyOtp'])->name('auth.otp.verify');
+
 Route::middleware(['check.login'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/admin', [AdminController::class, 'admin'])->name('admin.dashboard');
