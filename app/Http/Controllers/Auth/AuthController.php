@@ -8,6 +8,7 @@ use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\ValidationException;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
 use App\Mail\OtpMail;
 use Illuminate\Support\Facades\Mail;
@@ -37,14 +38,12 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        // Store user data in session manually
         session([
             'user_id' => $user->id,
             'username' => $user->username,
             'last_activity' => time()
         ]);
 
-        // Record Activity
         ActivityLog::create([
             'user_id' => $user->id,
             'username' => $user->username,
@@ -75,15 +74,35 @@ class AuthController extends Controller
         $user = User::where('email', $credentials['email'])->first();
 
         if ($user && $user->password === hash('sha256', $credentials['password'])) {
-            // Generate OTP
+            if ($request->hasCookie("verified_device_{$user->id}")) {
+                Auth::login($user, $request->boolean('remember'));
+                $request->session()->regenerate();
+
+                session([
+                    'user_id' => $user->id,
+                    'username' => $user->username,
+                    'last_activity' => time()
+                ]);
+
+                ActivityLog::create([
+                    'user_id' => $user->id,
+                    'username' => $user->username,
+                    'activity' => 'Login',
+                    'description' => 'User logged in (Recognized Device)',
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                ]);
+
+                return redirect()->intended('/admin');
+            }
+
             $otp = Str::random(6);
             $user->otp = $otp;
             $user->save();
             
-            // Send OTP Email
             Mail::to($user->email)->send(new OtpMail($otp));
             
-            // Store user id in session temporarily for OTP verification
+            session(['otp_user_id' => $user->id]);
             session(['otp_user_id' => $user->id]);
             
             return redirect()->route('auth.otp.form');
@@ -102,7 +121,6 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        // Record Activity BEFORE clearing session
         ActivityLog::create([
             'user_id' => session('user_id'),
             'username' => session('username'),
@@ -112,7 +130,6 @@ class AuthController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
 
-        // Clear manual session keys
         $request->session()->forget(['user_id', 'username', 'last_activity']);
 
         Auth::logout();
@@ -152,15 +169,34 @@ class AuthController extends Controller
             $user->save();
         }
 
-        // Generate OTP
+        if (request()->hasCookie("verified_device_{$user->id}")) {
+            Auth::login($user);
+            request()->session()->regenerate();
+
+            session([
+                'user_id' => $user->id,
+                'username' => $user->username,
+                'last_activity' => time()
+            ]);
+
+            ActivityLog::create([
+                'user_id' => $user->id,
+                'username' => $user->username,
+                'activity' => 'Login',
+                'description' => 'User logged in via Google (Recognized Device)',
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+
+            return redirect()->intended('/admin');
+        }
+
         $otp = Str::random(6);
         $user->otp = $otp;
         $user->save();
 
-        // Send OTP Email
         Mail::to($user->email)->send(new OtpMail($otp));
 
-        // Store user id in session temporarily for OTP verification
         session(['otp_user_id' => $user->id]);
 
         return redirect()->route('auth.otp.form');
@@ -191,22 +227,18 @@ class AuthController extends Controller
             return back()->withErrors(['otp' => 'Kode OTP salah.'])->withInput();
         }
 
-        // OTP is correct
-        $user->otp = null; // Reset OTP
+        $user->otp = null;
         $user->save();
 
-        // Login User
         Auth::login($user);
         $request->session()->regenerate();
 
-        // Store temporary session required by current app structure
         session([
             'user_id' => $user->id,
             'username' => $user->username,
             'last_activity' => time()
         ]);
 
-        // Record Activity
         ActivityLog::create([
             'user_id' => $user->id,
             'username' => $user->username,
@@ -216,9 +248,10 @@ class AuthController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
 
-        // Clear temporary OTP session
         session()->forget('otp_user_id');
 
-        return redirect()->intended('/admin');
+        $cookie = Cookie::make("verified_device_{$user->id}", true, 525600);
+
+        return redirect()->intended('/admin')->withCookie($cookie);
     }
 }

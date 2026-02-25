@@ -17,12 +17,10 @@ class CheckLoginMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // 1. Manual Session Check
         if (!$request->session()->has('user_id')) {
             return redirect()->route('login')->with('error', 'You must be logged in to access this page.');
         }
 
-        // 2. Inactivity Timeout (3600 seconds = 1 hour)
         $lastActivity = $request->session()->get('last_activity');
         $timeout = 3600;
 
@@ -32,11 +30,8 @@ class CheckLoginMiddleware
             return redirect()->route('login')->with('error', 'Session expired due to inactivity.');
         }
 
-        // 3. Update Last Activity
         $request->session()->put('last_activity', time());
 
-        // 4. Record Page Access
-        // Only log if it's not the activity logs page itself to avoid infinite loops of logs
         if (!$request->routeIs('admin.activity_logs')) {
             ActivityLog::create([
                 'user_id' => $request->session()->get('user_id'),
