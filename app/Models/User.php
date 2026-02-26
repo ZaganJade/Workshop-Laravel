@@ -30,6 +30,7 @@ class User extends Authenticatable
         'email',
         'password',
         'id_google',
+        'status',
         'otp',
     ];
 

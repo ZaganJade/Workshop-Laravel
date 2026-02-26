@@ -46,6 +46,13 @@
                     </div>
                     
                     <div class="card-body p-5">
+                        @if (session('status'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('status') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
                         <form action="{{ route('auth.otp.verify') }}" method="POST">
                             @csrf
                             <div class="mb-4">
@@ -58,13 +65,22 @@
                                     <div class="text-danger small mt-2 fw-bold">{{ $message }}</div>
                                 @enderror
                                 <div class="form-text mt-2 text-center text-secondary">
-                                    Kode terdiri atas 6 kombinasi huruf atau angka.
+                                    Kode terdiri atas 6 kombinasi angka.
                                 </div>
                             </div>
                             
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold rounded-3">
                                     Konfirmasi OTP
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <form action="{{ route('auth.otp.resend') }}" method="POST" class="mt-3">
+                            @csrf
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-outline-secondary btn-lg py-3 fw-bold rounded-3">
+                                    Kirim Ulang OTP
                                 </button>
                             </div>
                         </form>

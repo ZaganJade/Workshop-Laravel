@@ -18,7 +18,17 @@ class CheckLoginMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!$request->session()->has('user_id')) {
-            return redirect()->route('login')->with('error', 'You must be logged in to access this page.');
+            // Check if the user is authenticated via Laravel's "Remember Me" mechanisms
+            if (Auth::check()) {
+                $user = Auth::user();
+                $request->session()->put([
+                    'user_id' => $user->id,
+                    'username' => $user->username,
+                    'last_activity' => time()
+                ]);
+            } else {
+                return redirect()->route('login')->with('error', 'You must be logged in to access this page.');
+            }
         }
 
         $lastActivity = $request->session()->get('last_activity');

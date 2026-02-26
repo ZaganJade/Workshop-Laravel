@@ -74,7 +74,7 @@
                         </li>
                     @else
                         <li class="nav-item">
-                            <a class="nav-link text-white me-3" href="{{ url('/books') }}">Dashboard</a>
+                            <a class="nav-link text-white me-3" href="{{ route('admin.buku.index') }}">Dashboard</a>
                         </li>
                         <li class="nav-item">
                             <a class="btn btn-outline-light rounded-pill px-4" href="{{ route('logout') }}"
@@ -106,7 +106,7 @@
                         </div>
                     @else
                         <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-                            <a href="{{ url('/books') }}" class="btn btn-light btn-lg px-5 py-3 rounded-pill fw-bold shadow">Go to Manage Books</a>
+                            <a href="{{ route('admin.buku.index') }}" class="btn btn-light btn-lg px-5 py-3 rounded-pill fw-bold shadow">Go to Manage Books</a>
                         </div>
                         <div class="mt-4 opacity-75">
                             <p>You are logged in as <strong>{{ Auth::user()->name }}</strong></p>

@@ -5,6 +5,9 @@ use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\BukuController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\OtpHandlerController;
+use App\Http\Controllers\Auth\OauthGoogleHandlerController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,17 +16,19 @@ Route::get('/', [HomeController::class, 'index']);
 Auth::routes();
 
 // Manual Auth Routes
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Google OAuth Auth Routes
-Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
-Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+Route::get('/auth/google', [OauthGoogleHandlerController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [OauthGoogleHandlerController::class, 'handleGoogleCallback']);
 
 // OTP Routes
-Route::get('/auth/otp', [AuthController::class, 'showOtpForm'])->name('auth.otp.form');
-Route::post('/auth/otp', [AuthController::class, 'verifyOtp'])->name('auth.otp.verify');
+Route::get('/auth/otp', [OtpHandlerController::class, 'showOtpForm'])->name('auth.otp.form');
+Route::post('/auth/otp', [OtpHandlerController::class, 'verifyOtp'])->name('auth.otp.verify');
+Route::post('/auth/otp/resend', [OtpHandlerController::class, 'resendOtp'])->name('auth.otp.resend');
 
 Route::middleware(['check.login'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
