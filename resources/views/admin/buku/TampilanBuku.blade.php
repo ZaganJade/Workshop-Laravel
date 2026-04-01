@@ -14,6 +14,10 @@
             <span class="px-5 py-2.5 bg-slate-50 border border-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-2xl hidden sm:block">
                 {{ $buku->count() }} Koleksi Aktif
             </span>
+            <button type="button" onclick="openScopedModal('modalCetakPdfBuku')" class="group flex items-center px-6 py-3.5 bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-black rounded-2xl shadow-2xl shadow-red-200 transition-all active:scale-95">
+                <svg class="w-5 h-5 mr-3 group-hover:-translate-y-1 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Export PDF
+            </button>
             <button type="button" onclick="openScopedModal('modalTambahBuku')" class="group flex items-center px-8 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-black rounded-2xl shadow-2xl shadow-violet-200 transition-all active:scale-95">
                 <svg class="w-6 h-6 mr-3 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                 Registrasi Buku
@@ -95,6 +99,45 @@
     {{-- Scoped Modals Container --}}
     <div id="scopedModalOverlay" class="absolute inset-0 bg-slate-900/40 backdrop-blur-md z-[500] hidden flex items-center justify-center p-8 transition-all duration-300">
         
+        {{-- Modal Cetak PDF --}}
+        <div id="modalCetakPdfBuku" class="bg-white rounded-[3rem] shadow-2xl w-full max-w-md transform transition-all duration-300 scale-95 opacity-0 hidden overflow-hidden ring-1 ring-white/20">
+            <div class="px-10 py-8 border-b border-slate-50 flex items-center justify-between bg-gradient-to-br from-rose-50/50 via-white to-red-50/30">
+                <div>
+                    <h5 class="text-2xl font-black text-slate-900 tracking-tighter">Export PDF</h5>
+                    <p class="text-[10px] text-rose-400 font-bold uppercase tracking-[4px] mt-1.5">Kustomisasi Dokumen</p>
+                </div>
+                <button type="button" onclick="closeScopedModal('modalCetakPdfBuku')" class="p-3 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-3xl transition-all">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <form action="{{ route('admin.buku.pdf') }}" method="POST" target="_blank">
+                @csrf
+                <div class="p-10 space-y-6">
+                    <div>
+                        <label for="paper_size" class="block text-[11px] font-black text-slate-400 uppercase tracking-[2px] mb-3 ml-1">Ukuran Kertas</label>
+                        <select class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-rose-500/50 focus:ring-8 focus:ring-rose-500/5 transition-all text-sm font-black text-slate-800 shadow-sm" id="paper_size" name="paper_size" required>
+                            <option value="a4" selected>A4</option>
+                            <option value="letter">Letter</option>
+                            <option value="legal">Legal</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="orientation" class="block text-[11px] font-black text-slate-400 uppercase tracking-[2px] mb-3 ml-1">Orientasi</label>
+                        <select class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-rose-500/50 focus:ring-8 focus:ring-rose-500/5 transition-all text-sm font-black text-slate-800 shadow-sm" id="orientation" name="orientation" required>
+                            <option value="portrait" selected>Portrait</option>
+                            <option value="landscape">Landscape</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="px-10 py-8 bg-slate-50/50 border-t border-slate-100 flex justify-end gap-3">
+                    <button type="button" onclick="closeScopedModal('modalCetakPdfBuku')" class="px-6 py-3.5 text-xs font-black text-slate-400 hover:text-slate-700 uppercase tracking-widest transition-colors">Batal</button>
+                    <button type="submit" class="px-8 py-3.5 bg-rose-600 border border-rose-700 text-white text-xs font-black rounded-2xl shadow-xl shadow-rose-200 hover:bg-rose-700 transition-all active:scale-95 uppercase tracking-[2px]">
+                        Generate
+                    </button>
+                </div>
+            </form>
+        </div>
+
         {{-- Modal Tambah --}}
         <div id="modalTambahBuku" class="bg-white rounded-[3rem] shadow-2xl w-full max-w-2xl transform transition-all duration-300 scale-95 opacity-0 hidden overflow-hidden ring-1 ring-white/20">
             <div class="px-12 py-10 border-b border-slate-50 flex items-center justify-between bg-gradient-to-br from-violet-50/50 via-white to-fuchsia-50/30">

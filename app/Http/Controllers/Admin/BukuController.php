@@ -5,9 +5,25 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Buku;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class BukuController extends Controller
 {
+    public function generatePdf(Request $request)
+    {
+        $request->validate([
+            'paper_size' => 'required|in:a4,letter,legal',
+            'orientation' => 'required|in:portrait,landscape',
+        ]);
+
+        $buku = Buku::with('kategori')->get();
+        
+        $pdf = Pdf::loadView('admin.buku.pdf', compact('buku'))
+                  ->setPaper($request->paper_size, $request->orientation);
+                  
+        return $pdf->stream('katalog_buku.pdf');
+    }
+
     public function index()
     {
         $buku = Buku::with('kategori')->get();

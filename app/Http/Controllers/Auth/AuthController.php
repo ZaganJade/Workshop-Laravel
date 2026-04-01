@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\ValidationException;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
 use App\Mail\OtpMail;
@@ -62,7 +62,6 @@ class AuthController extends Controller
             
             Mail::to($user->email)->send(new OtpMail($otp));
             
-            session(['otp_user_id' => $user->id]);
             session(['otp_user_id' => $user->id]);
             
             return redirect()->route('auth.otp.form');

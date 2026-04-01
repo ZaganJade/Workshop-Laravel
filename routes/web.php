@@ -44,6 +44,8 @@ Route::middleware(['check.login'])->group(function () {
         'destroy' => 'admin.kategori.destroy',
     ]);
 
+    Route::post('/admin/buku/pdf', [BukuController::class, 'generatePdf'])->name('admin.buku.pdf');
+
     Route::resource('/admin/buku', BukuController::class)->names([
         'index' => 'admin.buku.index',
         'create' => 'admin.buku.create',
