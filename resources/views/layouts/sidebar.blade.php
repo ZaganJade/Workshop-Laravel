@@ -33,6 +33,12 @@
           <i class="mdi mdi-book-open-variant menu-icon"></i>
         </a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ route('admin.barang.index') }}">
+          <span class="menu-title">Barang</span>
+          <i class="mdi mdi-barcode menu-icon"></i>
+        </a>
+      </li>
     </ul>
   </nav>
 </div>

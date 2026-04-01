@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\OtpHandlerController;
 use App\Http\Controllers\Auth\OauthGoogleHandlerController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PrintController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index']);
@@ -54,4 +55,8 @@ Route::middleware(['check.login'])->group(function () {
         'update' => 'admin.buku.update',
         'destroy' => 'admin.buku.destroy',
     ]);
+
+    // Barang Print Label Routes
+    Route::get('/admin/barang', [PrintController::class, 'index'])->name('admin.barang.index');
+    Route::post('/admin/print-label', [PrintController::class, 'print'])->name('admin.print-label');
 });
