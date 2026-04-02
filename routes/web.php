@@ -59,4 +59,18 @@ Route::middleware(['check.login'])->group(function () {
     // Barang Print Label Routes
     Route::get('/admin/barang', [PrintController::class, 'index'])->name('admin.barang.index');
     Route::post('/admin/print-label', [PrintController::class, 'print'])->name('admin.print-label');
+
+    // Wilayah (Blade + jQuery only, no database)
+    Route::get('/admin/wilayah', function () {
+        return view('admin.wilayah.wilayah');
+    })->name('admin.wilayah');
+
+    // Tambah Barang (Blade + jQuery only, no database)
+    Route::get('/admin/tambah-barang/html', function () {
+        return view('admin.tambah-barang.tambah_barang-index');
+    })->name('admin.tambah-barang.html');
+
+    Route::get('/admin/tambah-barang/datatables', function () {
+        return view('admin.tambah-barang.index-datatables');
+    })->name('admin.tambah-barang.datatables');
 });

@@ -39,6 +39,18 @@
           <i class="mdi mdi-barcode menu-icon"></i>
         </a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url('/admin/wilayah') }}">
+          <span class="menu-title">Wilayah</span>
+          <i class="mdi mdi-map-marker menu-icon"></i>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url('/admin/tambah-barang/html') }}">
+          <span class="menu-title">Tambah Barang</span>
+          <i class="mdi mdi-cart-plus menu-icon"></i>
+        </a>
+      </li>
     </ul>
   </nav>
 </div>
