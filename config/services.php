@@ -41,4 +41,9 @@ return [
         'redirect' => env('GOOGLE_REDIRECT'),
     ],
 
+    'fireworks' => [
+        'key' => env('FIREWORKS_API_KEY'),
+        'model' => env('FIREWORKS_MODEL', 'accounts/fireworks/routers/kimi-k2p5-turbo'),
+    ],
+
 ];

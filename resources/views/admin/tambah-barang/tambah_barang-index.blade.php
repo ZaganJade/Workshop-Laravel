@@ -1,133 +1,121 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Barang - HTML Table')
-
-@push('css')
-@include('admin.tambah-barang.css.tambah-barang-common')
-@include('admin.tambah-barang.css.html-table-style')
-@endpush
+@section('title', 'Tambah Barang')
 
 @section('content')
 
-<div class="tb-page-header">
+<div class="modern-page-header">
     <h3>
-        <span class="page-title-icon bg-gradient-primary text-white me-2" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#6d28d9);">
-            <i class="mdi mdi-cart-plus" style="color:#fff;font-size:1.1rem;"></i>
-        </span>
-        Tambah Barang
-        <span class="tb-badge">HTML Table</span>
+        <div class="modern-header-icon">
+            <i class="mdi mdi-cart-plus"></i>
+        </div>
+        Tambah Barang Baru
     </h3>
-    <button type="button" class="tb-btn-add" id="btnOpenModal">
-        <i class="mdi mdi-plus"></i> Tambah Barang
+    <button type="button" class="btn btn-gradient-primary font-weight-bold" id="btnOpenModal" style="border-radius: 12px; padding: 12px 24px;">
+        <i class="mdi mdi-plus me-1"></i> Tambah Barang
     </button>
 </div>
 
 {{-- Tab Navigation --}}
-<div class="tb-nav-tabs">
-    <a href="{{ url('/admin/tambah-barang/html') }}" class="tb-nav-tab active">
-        <i class="mdi mdi-table"></i> HTML Table
-    </a>
-    <a href="{{ url('/admin/tambah-barang/datatables') }}" class="tb-nav-tab">
-        <i class="mdi mdi-table-large"></i> DataTables
-    </a>
+<ul class="nav nav-pills mb-4 gap-2" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a href="{{ url('/admin/tambah-barang/html') }}" class="nav-link active font-weight-bold" style="border-radius: 10px; padding: 12px 20px;">
+            <i class="mdi mdi-table me-1"></i> HTML Table
+        </a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a href="{{ url('/admin/tambah-barang/datatables') }}" class="nav-link bg-white text-muted border font-weight-bold" style="border-radius: 10px; padding: 12px 20px;">
+            <i class="mdi mdi-table-large me-1"></i> DataTables
+        </a>
+    </li>
+</ul>
+
+<div class="card">
+    <div class="card-body p-4">
+        <div class="table-responsive">
+            <table class="table table-hover w-100" id="myTable">
+                <thead class="bg-light">
+                    <tr>
+                        <th style="width: 80px; border-top: none;">ID</th>
+                        <th style="border-top: none;">Nama Barang</th>
+                        <th style="width: 200px; border-top: none;">Harga</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="3" class="text-center py-5 text-muted">
+                            <i class="mdi mdi-package-variant-closed fs-1 d-block mb-2 opacity-50"></i>
+                            Belum ada data barang. Klik <strong>"+ Tambah Barang"</strong> untuk memulai.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-{{-- Table Card --}}
-<div class="tb-card">
-    <table class="tb-table" id="myTable">
-        <thead>
-            <tr>
-                <th style="width:80px;">ID</th>
-                <th>Nama Barang</th>
-                <th style="width:200px;">Harga</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            <tr>
-                <td colspan="3" class="tb-empty">Belum ada data barang. Klik "+ Tambah Barang" untuk menambahkan.</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-{{-- Modal --}}
-<div class="tb-modal-overlay" id="modalTambah">
-    <div class="tb-modal">
-        <h4><i class="mdi mdi-package-variant-closed"></i> Tambah Barang Baru</h4>
-        <form id="formTambah" novalidate>
-            <label for="inputNama">Nama Barang <span style="color:#ef4444;">*</span></label>
-            <input type="text" id="inputNama" placeholder="Masukkan nama barang..." required>
-
-            <label for="inputHarga">Harga Barang <span style="color:#ef4444;">*</span></label>
-            <input type="number" id="inputHarga" placeholder="Masukkan harga barang..." required min="0">
-
-            <div class="tb-modal-footer">
-                <button type="button" class="tb-btn-cancel" id="btnBatal">Batal</button>
-                <button type="submit" class="tb-btn-save" id="btnSimpan">
-                    <i class="mdi mdi-content-save"></i> Simpan
-                </button>
+{{-- Modal Tambah --}}
+<div class="modal fade" id="modalTambah" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 24px; border: none; overflow: hidden;">
+            <div class="modal-header border-0 p-4" style="background: linear-gradient(135deg, var(--primary-indigo), var(--primary-violet)); color: white;">
+                <h5 class="modal-title font-weight-bold"><i class="mdi mdi-package-variant-plus me-2"></i>Tambah Barang Baru</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-        </form>
+            <form id="formTambah">
+                <div class="modal-body p-4">
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold text-dark mb-2">Nama Barang</label>
+                        <input type="text" id="inputNama" class="form-control" placeholder="Masukkan nama barang..." required 
+                               style="border-radius: 12px; padding: 12px; border: 2px solid #f1f5f9; background: #f8fafc;">
+                    </div>
+                    <div class="form-group mb-0">
+                        <label class="font-weight-bold text-dark mb-2">Harga Barang (Rp)</label>
+                        <input type="number" id="inputHarga" class="form-control" placeholder="Contoh: 15000" required min="0"
+                               style="border-radius: 12px; padding: 12px; border: 2px solid #f1f5f9; background: #f8fafc;">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light font-weight-bold" data-bs-dismiss="modal" style="border-radius: 12px; padding: 12px 24px;">Batal</button>
+                    <button type="submit" class="btn btn-gradient-primary font-weight-bold" id="btnSimpan" style="border-radius: 12px; padding: 12px 24px;">
+                        <span id="txtSimpan"><i class="mdi mdi-content-save me-1"></i> Simpan</span>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 @endsection
 
 @push('js')
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
 $(document).ready(function() {
-
     let dataBarang = [];
     let idCounter = 1;
 
-    // Open modal
+    // Open Modal logic
+    const modalTambah = new bootstrap.Modal(document.getElementById('modalTambah'));
+    
     $('#btnOpenModal').click(function() {
-        $('#modalTambah').addClass('active');
-        $('#inputNama').focus();
+        modalTambah.show();
     });
 
-    // Close modal
-    $('#btnBatal').click(function() {
-        closeModal();
+    // Reset focus when modal opens
+    document.getElementById('modalTambah').addEventListener('shown.bs.modal', function () {
+        document.getElementById('inputNama').focus();
     });
 
-    // Close on overlay click
-    $('#modalTambah').click(function(e) {
-        if ($(e.target).is('#modalTambah')) {
-            closeModal();
-        }
-    });
-
-    // Close on ESC key
-    $(document).keydown(function(e) {
-        if (e.key === 'Escape') closeModal();
-    });
-
-    function closeModal() {
-        $('#modalTambah').removeClass('active');
-        $('#formTambah')[0].reset();
-    }
-
-    // Submit form
+    // Handle form submit
     $('#formTambah').submit(function(e) {
         e.preventDefault();
-
-        let form = this;
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
 
         let nama = $('#inputNama').val().trim();
         let harga = $('#inputHarga').val().trim();
 
         if (nama === '' || harga === '') return;
 
-        // Loading state
-        let $btn = $('#btnSimpan');
-        let originalHTML = $btn.html();
-        $btn.html('<span class="tb-spinner"></span> Menyimpan...').prop('disabled', true);
+        $('#btnSimpan').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> Menyimpan...');
 
         setTimeout(function() {
             dataBarang.push({
@@ -137,31 +125,36 @@ $(document).ready(function() {
             });
 
             renderTable();
-            closeModal();
-
-            // Reset button
-            $btn.html(originalHTML).prop('disabled', false);
+            modalTambah.hide();
+            $('#formTambah')[0].reset();
+            $('#btnSimpan').prop('disabled', false).html('<i class="mdi mdi-content-save me-1"></i> Simpan');
         }, 600);
     });
 
     function renderTable() {
         let html = '';
         if (dataBarang.length === 0) {
-            html = '<tr><td colspan="3" class="tb-empty">Belum ada data barang. Klik "+ Tambah Barang" untuk menambahkan.</td></tr>';
+            html = '<tr><td colspan="3" class="text-center py-5 text-muted"><i class="mdi mdi-package-variant-closed fs-1 d-block mb-2 opacity-50"></i>Belum ada data barang. Klik <strong>"+ Tambah Barang"</strong> untuk memulai.</td></tr>';
         } else {
             dataBarang.forEach(function(item) {
                 html += `
                     <tr>
-                        <td><strong>${item.id}</strong></td>
-                        <td>${item.nama}</td>
-                        <td>Rp ${Number(item.harga).toLocaleString('id-ID')}</td>
+                        <td><span class="badge bg-dark font-weight-bold" style="border-radius: 6px;">#${item.id}</span></td>
+                        <td><span class="font-weight-bold text-dark">${item.nama}</span></td>
+                        <td><span class="badge bg-soft-success text-success font-weight-bold" style="border-radius: 8px; padding: 8px 12px;">Rp ${Number(item.harga).toLocaleString('id-ID')}</span></td>
                     </tr>
                 `;
             });
         }
         $('#tableBody').html(html);
     }
-
 });
 </script>
+<style>
+    .bg-soft-success { background-color: #f0fdf4 !important; }
+    .nav-pills .nav-link.active {
+        background: linear-gradient(135deg, var(--primary-indigo), var(--primary-violet)) !important;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2) !important;
+    }
+</style>
 @endpush

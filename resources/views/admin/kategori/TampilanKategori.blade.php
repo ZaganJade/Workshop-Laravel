@@ -1,55 +1,56 @@
 @extends('layouts.app')
 
-@section('title', 'Tampilan Kategori')
+@section('title', 'Manajemen Kategori')
 
 @section('content')
-<div class="relative min-h-[600px]">
-    {{-- Header Section --}}
-    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div>
-            <h3 class="text-3xl font-black text-slate-800 tracking-tighter">Kategori Buku</h3>
-            <p class="text-slate-500 font-medium mt-1">Kelola klasifikasi koleksi perpustakaan Anda.</p>
+<div class="modern-page-header">
+    <h3>
+        <div class="modern-header-icon">
+            <i class="mdi mdi-tag-outline"></i>
         </div>
-        <button type="button" onclick="openScopedModal('modalTambahKategori')" class="group flex items-center px-6 py-3 bg-slate-900 border border-slate-700 hover:bg-violet-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-violet-200 transition-all active:scale-95">
-            <svg class="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-            Tambah Baru
-        </button>
-    </div>
+        Manajemen Kategori
+    </h3>
+    <button type="button" onclick="openModal('modalTambahKategori')" class="btn btn-gradient-primary btn-md font-weight-bold" style="border-radius: 12px; padding: 12px 24px;">
+        <i class="mdi mdi-plus me-1"></i> Tambah Kategori
+    </button>
+</div>
 
-    {{-- Main Table Area --}}
-    <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden ring-1 ring-slate-200/50">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+<div class="card">
+    <div class="card-body p-4">
+        <div class="table-responsive">
+            <table id="kategoriTable" class="display w-100">
                 <thead>
-                    <tr class="bg-slate-50/50">
-                        <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[3px] w-20">No</th>
-                        <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[3px]">Kategori</th>
-                        <th class="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[3px] text-center w-48">Operasi</th>
+                    <tr>
+                        <th style="width: 80px;">No</th>
+                        <th>Nama Kategori</th>
+                        <th class="text-center" style="width: 150px;">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-50">
+                <tbody>
                     @foreach($kategori as $index => $item)
-                    <tr class="hover:bg-slate-50/50 transition-colors group">
-                        <td class="px-8 py-5 text-sm font-black text-slate-300">{{ $index + 1 }}</td>
-                        <td class="px-8 py-5">
-                            <span class="text-base font-bold text-slate-700 group-hover:text-violet-600 transition-colors">{{ $item->nama_kategori }}</span>
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--primary-violet); margin-right: 12px;"></div>
+                                <span class="font-weight-bold text-dark">{{ $item->nama_kategori }}</span>
+                            </div>
                         </td>
-                        <td class="px-8 py-5 text-center">
-                            <div class="flex items-center justify-center space-x-2">
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
                                 <button type="button" 
-                                        class="btn-edit-kategori p-3 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-blue-500 hover:border-blue-200 hover:shadow-lg transition-all"
+                                        class="btn btn-inverse-info btn-icon btn-sm btn-edit-kategori"
                                         data-id="{{ $item->idkategori }}"
                                         data-name="{{ $item->nama_kategori }}"
-                                        data-url="{{ route('admin.kategori.update', $item->idkategori) }}">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        data-url="{{ route('admin.kategori.update', $item->idkategori) }}"
+                                        title="Edit">
+                                    <i class="mdi mdi-pencil"></i>
                                 </button>
-                                <form action="{{ route('admin.kategori.destroy', $item->idkategori) }}" method="POST" class="inline">
+                                <form action="{{ route('admin.kategori.destroy', $item->idkategori) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" 
-                                            class="p-3 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-rose-500 hover:border-rose-200 hover:shadow-lg transition-all"
-                                            onclick="return confirm('Hapus kategori ini?')">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    <button type="submit" class="btn btn-inverse-danger btn-icon btn-sm" onclick="return confirm('Hapus kategori ini?')" title="Hapus">
+                                        <i class="mdi mdi-delete"></i>
                                     </button>
                                 </form>
                             </div>
@@ -59,84 +60,99 @@
                 </tbody>
             </table>
         </div>
-        @if($kategori->isEmpty())
-            <div class="text-center py-24 bg-slate-50/30">
-                <div class="inline-flex items-center justify-center w-24 h-24 bg-white rounded-full shadow-inner mb-6">
-                    <svg class="w-10 h-10 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                </div>
-                <h5 class="text-lg font-black text-slate-400 uppercase tracking-widest">Data Kosong</h5>
-            </div>
-        @endif
     </div>
+</div>
 
-    {{-- Scoped Modals Container --}}
-    <div id="scopedModalOverlay" class="absolute inset-x-0 inset-y-0 bg-slate-900/40 backdrop-blur-md z-[500] hidden flex items-center justify-center p-8 transition-all duration-300">
-        
-        {{-- Modal Tambah --}}
-        <div id="modalTambahKategori" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg transform transition-all duration-300 scale-95 opacity-0 hidden overflow-hidden ring-1 ring-white/20">
-            <div class="px-10 py-8 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-violet-50/50 to-white">
-                <div>
-                    <h5 class="text-2xl font-black text-slate-800 tracking-tighter">Tambah Kategori</h5>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-[2px] mt-1">Entri data kategori baru</p>
-                </div>
-                <button type="button" onclick="closeScopedModal('modalTambahKategori')" class="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+{{-- Modal Tambah --}}
+<div class="modal fade" id="modalTambahKategori" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 24px; border: none; overflow: hidden;">
+            <div class="modal-header border-0 p-4" style="background: linear-gradient(135deg, var(--primary-indigo), var(--primary-violet)); color: white;">
+                <h5 class="modal-title font-weight-bold"><i class="mdi mdi-plus-circle-outline me-2"></i>Tambah Kategori Baru</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('admin.kategori.store') }}" method="POST">
                 @csrf
-                <div class="p-10">
-                    <div class="space-y-6">
-                        <div>
-                            <label for="nama_kategori" class="block text-[11px] font-black text-slate-400 uppercase tracking-[2px] mb-2.5 ml-1">Label Kategori</label>
-                            <input type="text" class="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-violet-500/50 focus:ring-4 focus:ring-violet-500/5 transition-all text-sm font-bold text-slate-700 placeholder:text-slate-300" id="nama_kategori" name="nama_kategori" placeholder="Misal: Fiksi, Eksperimen" required>
-                        </div>
+                <div class="modal-body p-4">
+                    <div class="form-group mb-0">
+                        <label class="font-weight-bold text-dark mb-2">Nama Kategori</label>
+                        <input type="text" class="form-control" name="nama_kategori" placeholder="Misal: Fiksi, Eksperimen" required 
+                               style="border-radius: 12px; padding: 14px; border: 2px solid #f1f5f9; background: #f8fafc;">
                     </div>
                 </div>
-                <div class="px-10 py-8 bg-slate-50/50 border-t border-slate-100 flex justify-end gap-3">
-                    <button type="button" onclick="closeScopedModal('modalTambahKategori')" class="px-6 py-3 text-sm font-black text-slate-400 hover:text-slate-600 uppercase tracking-wide">Batalkan</button>
-                    <button type="submit" class="px-10 py-3 bg-violet-600 text-white text-sm font-black rounded-2xl shadow-lg shadow-violet-200 hover:bg-violet-700 transition-all active:scale-95 uppercase tracking-widest">
-                        Simpan Data
-                    </button>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light font-weight-bold" data-bs-dismiss="modal" style="border-radius: 12px; padding: 12px 24px;">Batal</button>
+                    <button type="submit" class="btn btn-gradient-primary font-weight-bold" style="border-radius: 12px; padding: 12px 24px;">Simpan</button>
                 </div>
             </form>
         </div>
+    </div>
+</div>
 
-        {{-- Modal Edit --}}
-        <div id="modalEditKategori" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg transform transition-all duration-300 scale-95 opacity-0 hidden overflow-hidden ring-1 ring-white/20">
-            <div class="px-10 py-8 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-blue-50/50 to-white">
-                <div>
-                    <h5 class="text-2xl font-black text-slate-800 tracking-tighter">Perbarui Kategori</h5>
-                    <p class="text-[10px] text-blue-400 font-bold uppercase tracking-[2px] mt-1">Ubah identitas kategori</p>
-                </div>
-                <button type="button" onclick="closeScopedModal('modalEditKategori')" class="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+{{-- Modal Edit --}}
+<div class="modal fade" id="modalEditKategori" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 24px; border: none; overflow: hidden;">
+            <div class="modal-header border-0 p-4 bg-info text-white">
+                <h5 class="modal-title font-weight-bold"><i class="mdi mdi-pencil-outline me-2"></i>Perbarui Kategori</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="formEditKategori" action="" method="POST">
                 @csrf
                 @method('PUT')
-                <div class="p-10">
-                    <div class="space-y-6">
-                        <div>
-                            <label for="edit_nama_kategori" class="block text-[11px] font-black text-slate-400 uppercase tracking-[2px] mb-2.5 ml-1">Label Kategori</label>
-                            <input type="text" class="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-bold text-slate-700" id="edit_nama_kategori" name="nama_kategori" required>
-                        </div>
+                <div class="modal-body p-4">
+                    <div class="form-group mb-0">
+                        <label class="font-weight-bold text-dark mb-2">Nama Kategori</label>
+                        <input type="text" class="form-control" id="edit_nama_kategori" name="nama_kategori" required 
+                               style="border-radius: 12px; padding: 14px; border: 2px solid #f1f5f9; background: #f8fafc;">
                     </div>
                 </div>
-                <div class="px-10 py-8 bg-slate-50/50 border-t border-slate-100 flex justify-end gap-3">
-                    <button type="button" onclick="closeScopedModal('modalEditKategori')" class="px-6 py-3 text-sm font-black text-slate-400 hover:text-slate-600 uppercase tracking-wide">Batalkan</button>
-                    <button type="submit" class="px-10 py-3 bg-blue-600 text-white text-sm font-black rounded-2xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 uppercase tracking-widest">
-                        Update Data
-                    </button>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light font-weight-bold" data-bs-dismiss="modal" style="border-radius: 12px; padding: 12px 24px;">Batal</button>
+                    <button type="submit" class="btn btn-info text-white font-weight-bold" style="border-radius: 12px; padding: 12px 24px;">Update</button>
                 </div>
             </form>
         </div>
-
     </div>
 </div>
+
 @endsection
 
 @push('js')
-<script src="{{ asset('js/kategori.js') }}"></script>
+<script>
+    $(document).ready(function() {
+        $('#kategoriTable').DataTable({
+            responsive: true,
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ kategori",
+                paginate: {
+                    first: "Awal",
+                    last: "Akhir",
+                    next: "Lanjut",
+                    previous: "Kembali"
+                }
+            }
+        });
+
+        // Edit Modal Trigger
+        $('.btn-edit-kategori').on('click', function() {
+            const id = $(this).data('id');
+            const name = $(this).data('name');
+            const url = $(this).data('url');
+
+            $('#edit_nama_kategori').val(name);
+            $('#formEditKategori').attr('action', url);
+            
+            const modal = new bootstrap.Modal(document.getElementById('modalEditKategori'));
+            modal.show();
+        });
+    });
+
+    function openModal(id) {
+        const modal = new bootstrap.Modal(document.getElementById(id));
+        modal.show();
+    }
+</script>
 @endpush

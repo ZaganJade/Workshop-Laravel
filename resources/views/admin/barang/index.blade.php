@@ -1,95 +1,131 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Barang')
+@section('title', 'Inventaris Barang')
 
 @section('content')
-<div class="relative min-h-[800px]">
-    {{-- Header Section --}}
-    <div class="mb-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-        <div>
-            <h3 class="text-4xl font-black text-slate-900 tracking-tighter">Katalog Barang</h3>
-            <p class="text-slate-500 font-semibold mt-1 tracking-tight">Manajemen data barang & cetak label harga.</p>
+<div class="modern-page-header">
+    <h3>
+        <div class="modern-header-icon">
+            <i class="mdi mdi-cube-outline"></i>
         </div>
-        <div class="flex items-center gap-4">
-            <span id="itemCountBadge" class="px-5 py-2.5 bg-slate-50 border border-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-2xl hidden sm:block">
-                {{ $barang->count() }} Item Terdaftar
-            </span>
-            <button type="button" id="btnPrintTnj" disabled
-                    class="group flex items-center px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed text-white font-black rounded-2xl shadow-2xl shadow-emerald-200 disabled:shadow-slate-100 transition-all active:scale-95">
-                <svg class="w-5 h-5 mr-3 group-hover:-translate-y-1 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                <span id="btnPrintText">Print Label TNJ</span>
-            </button>
-            <button type="button" onclick="openScopedModal('modalTambahBarang')" class="group flex items-center px-8 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-black rounded-2xl shadow-2xl shadow-violet-200 transition-all active:scale-95">
-                <svg class="w-6 h-6 mr-3 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                + Tambah Barang
-            </button>
-        </div>
+        Katalog Inventaris Barang
+    </h3>
+    <div class="d-flex gap-2">
+        <button type="button" id="btnPrintTnj" disabled
+                class="btn btn-inverse-success font-weight-bold" style="border-radius: 12px; padding: 12px 20px;">
+            <i class="mdi mdi-printer me-1"></i> <span id="btnPrintText">Print Label TNJ</span>
+        </button>
+        <button type="button" onclick="openModal('modalTambahBarang')" class="btn btn-gradient-primary font-weight-bold" style="border-radius: 12px; padding: 12px 20px;">
+            <i class="mdi mdi-plus me-1"></i> Tambah Barang
+        </button>
     </div>
+</div>
 
-    {{-- Collection Card --}}
-    <div class="bg-white rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] border border-slate-100 overflow-hidden ring-1 ring-slate-200/50">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+<div class="card">
+    <div class="card-body p-4">
+        <div class="table-responsive">
+            <table id="barangTable" class="display w-100">
                 <thead>
-                    <tr class="bg-slate-50/50">
-                        <th class="px-8 py-6 text-[11px] font-black text-slate-400 border-none uppercase tracking-[4px] text-center w-20">
-                            <label class="inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="selectAll" class="w-5 h-5 rounded-lg border-2 border-slate-200 text-emerald-500 focus:ring-emerald-400 focus:ring-offset-0 cursor-pointer accent-emerald-500">
-                            </label>
+                    <tr>
+                        <th style="width: 40px;" class="text-center">
+                            <div class="form-check m-0 p-0 d-flex justify-content-center">
+                                <input type="checkbox" id="selectAll" class="form-check-input" style="width: 18px; height: 18px; border: 2px solid #cbd5e1; cursor: pointer;">
+                            </div>
                         </th>
-                        <th class="px-10 py-6 text-[11px] font-black text-slate-400 border-none uppercase tracking-[4px]">ID Barang</th>
-                        <th class="px-10 py-6 text-[11px] font-black text-slate-400 border-none uppercase tracking-[4px]">Nama Barang</th>
-                        <th class="px-10 py-6 text-[11px] font-black text-slate-400 border-none uppercase tracking-[4px]">Harga</th>
+                        <th style="width: 100px;">ID Barang</th>
+                        <th>Nama Barang</th>
+                        <th>Harga Satuan</th>
+                        <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="barangTableBody" class="divide-y divide-slate-50">
+                <tbody id="barangTableBody">
                     @foreach($barang as $item)
-                    <tr class="group hover:bg-slate-50/70 transition-all duration-300 barang-row">
-                        <td class="px-8 py-5 text-center">
-                            <input type="checkbox" class="barang-checkbox w-5 h-5 rounded-lg border-2 border-slate-200 text-emerald-500 focus:ring-emerald-400 focus:ring-offset-0 cursor-pointer accent-emerald-500"
-                                   value="{{ $item->id_barang }}" data-nama="{{ $item->nama }}" data-harga="{{ $item->harga }}">
+                    <tr class="barang-row">
+                        <td class="text-center">
+                            <div class="form-check m-0 p-0 d-flex justify-content-center">
+                                <input type="checkbox" class="barang-checkbox form-check-input" 
+                                       value="{{ $item->id_barang }}" 
+                                       data-nama="{{ $item->nama }}" 
+                                       data-harga="{{ $item->harga }}"
+                                       style="width: 18px; height: 18px; border: 2px solid #cbd5e1; cursor: pointer;">
+                            </div>
                         </td>
-                        <td class="px-10 py-5">
-                            <span class="px-4 py-1.5 bg-slate-900 text-white text-[11px] font-black rounded-lg border border-slate-700 uppercase tracking-widest shadow-lg shadow-slate-200">
+                        <td>
+                            <span class="badge bg-dark text-white font-weight-bold px-3 py-2" style="border-radius: 8px; font-size: 0.75rem;">
                                 {{ $item->id_barang }}
                             </span>
                         </td>
-                        <td class="px-10 py-5">
-                            <div class="text-lg font-black text-slate-800 tracking-tight group-hover:text-emerald-600 transition-colors">{{ $item->nama }}</div>
+                        <td>
+                            <span class="font-weight-bold text-dark" style="font-size: 1rem;">{{ $item->nama }}</span>
                         </td>
-                        <td class="px-10 py-5">
-                            <span class="inline-flex items-center px-4 py-1.5 rounded-xl text-[12px] font-black bg-emerald-50 text-emerald-700 border border-emerald-100 tracking-wide">
+                        <td>
+                            <span class="badge bg-light text-success border border-success-subtle px-3 py-2" style="border-radius: 8px; font-size: 0.85rem; font-weight: 700;">
                                 Rp {{ number_format($item->harga, 0, ',', '.') }}
                             </span>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <button type="button" 
+                                        class="btn btn-inverse-info btn-icon btn-sm btn-edit-barang"
+                                        data-id="{{ $item->id_barang }}"
+                                        data-nama="{{ $item->nama }}"
+                                        data-harga="{{ $item->harga }}"
+                                        title="Edit">
+                                    <i class="mdi mdi-pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-inverse-danger btn-icon btn-sm" onclick="alert('Fitur hapus dinonaktifkan untuk demo ini.')" title="Hapus">
+                                    <i class="mdi mdi-delete"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
-        @if($barang->isEmpty())
-            <div class="text-center py-32 bg-slate-50/20">
-                <div class="w-24 h-24 mx-auto bg-slate-100 rounded-[2rem] flex items-center justify-center mb-8 shadow-inner">
-                    <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                </div>
-                <h5 class="text-xl font-black text-slate-300 uppercase tracking-[6px]">Belum Ada Barang</h5>
-            </div>
-        @endif
-    </div>
-
-    {{-- Scoped Modals Container --}}
-    <div id="scopedModalOverlay" class="absolute inset-0 bg-slate-900/40 backdrop-blur-md z-[500] hidden flex items-center justify-center p-8 transition-all duration-300">
-
-        {{-- Modal: Print Label TNJ --}}
-        @include('admin.barang.Feature.modals_print_tnj')
-
-        {{-- Modal: Tambah & Edit Barang --}}
-        @include('admin.barang.Feature.modals_tambah_barang')
-
     </div>
 </div>
+
+{{-- Modals Container --}}
+<div id="modalContainer">
+    {{-- Modal: Print Label TNJ --}}
+    @include('admin.barang.Feature.modals_print_tnj')
+
+    {{-- Modal: Tambah & Edit Barang --}}
+    @include('admin.barang.Feature.modals_tambah_barang')
+</div>
+
 @endsection
 
 @push('js')
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable
+        var table = $('#barangTable').DataTable({
+            responsive: true,
+            columnDefs: [
+                { orderable: false, targets: 0 }
+            ],
+            language: {
+                search: "Cari barang:",
+                lengthMenu: "Tampilkan _MENU_ entri",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ barang",
+                paginate: {
+                    first: "Awal",
+                    last: "Akhir",
+                    next: "Lanjut",
+                    previous: "Kembali"
+                }
+            }
+        });
+
+        // Sync Select All logic with DataTables (handles all pages if possible, but here we just keep the IDs)
+    });
+
+    function openModal(id) {
+        const modal = new bootstrap.Modal(document.getElementById(id));
+        modal.show();
+    }
+</script>
 <script src="{{ asset('js/barang.js') }}"></script>
 @endpush

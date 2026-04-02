@@ -1,81 +1,233 @@
 @extends('layouts.app')
 
-@section('title', 'Activity Logs')
+@section('title', 'History Log Aktivitas')
+
+@push('css')
+{{-- DataTables CSS --}}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<style>
+    .log-page-header {
+        background: #fff;
+        padding: 24px 30px;
+        border-radius: 20px;
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        border: 1px solid #f0f0f0;
+    }
+    .log-page-header h3 {
+        font-weight: 800;
+        margin: 0;
+        color: #1f2937;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .log-header-icon {
+        width: 42px;
+        height: 42px;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: white;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+
+    .log-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid #f0f0f0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        padding: 24px;
+    }
+
+    {{-- DataTables Custom Styles --}}
+    .dataTables_wrapper .dataTables_length select,
+    .dataTables_wrapper .dataTables_filter input {
+        border: 1px solid #e5e7eb !important;
+        border-radius: 8px !important;
+        padding: 6px 12px !important;
+        background-color: #f9fafb !important;
+        outline: none !important;
+    }
+    .dataTables_wrapper .dataTables_filter input:focus {
+        border-color: #4f46e5 !important;
+        background-color: #fff !important;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1) !important;
+    }
+
+    table.dataTable.no-footer {
+        border-bottom: 1px solid #f3f4f6 !important;
+        margin-top: 20px !important;
+        margin-bottom: 20px !important;
+    }
+    table.dataTable thead th {
+        background: #f8fafc !important;
+        padding: 15px 20px !important;
+        font-size: 0.75rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        color: #64748b !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+    table.dataTable tbody td {
+        padding: 16px 20px !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        font-size: 0.875rem !important;
+        color: #334155 !important;
+        vertical-align: middle !important;
+    }
+    table.dataTable tbody tr:hover {
+        background-color: #f8fafc !important;
+    }
+
+    {{-- Pagination Styling --}}
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #4f46e5 !important;
+        color: white !important;
+        border: 1px solid #4f46e5 !important;
+        border-radius: 8px !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: #eef2ff !important;
+        border: 1px solid #e0e7ff !important;
+        color: #4f46e5 !important;
+        border-radius: 8px !important;
+    }
+
+    {{-- Badges --}}
+    .badge-log {
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-block;
+    }
+    .badge-login { background: #ecfdf5; color: #059669; border: 1px solid #d1fae5; }
+    .badge-logout { background: #fff7ed; color: #d97706; border: 1px solid #ffedd5; }
+    .badge-delete { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
+    .badge-access { background: #eef2ff; color: #4f46e5; border: 1px solid #e0e7ff; }
+    .badge-default { background: #f9fafb; color: #6b7280; border: 1px solid #f3f4f6; }
+
+    .user-pill {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #e0e7ff;
+        color: #4338ca;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.75rem;
+    }
+</style>
+@endpush
 
 @section('content')
-<div class="mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-    <div>
-        <h3 class="text-3xl font-black text-slate-800 tracking-tighter">Log Aktivitas</h3>
-        <p class="text-slate-500 font-medium mt-1">Jejak audit menyeluruh tindakan sistem perpustakaan.</p>
+<div class="log-page-header">
+    <h3>
+        <div class="log-header-icon">
+            <i class="mdi mdi-history"></i>
+        </div>
+        Log Aktivitas Sistem
+    </h3>
+    <div style="font-size: 0.8rem; color: #6b7280; font-weight: 600; background: #f3f4f6; padding: 6px 16px; border-radius: 50px;">
+        <i class="mdi mdi-sync me-1"></i> Terakhir sinkronisasi: {{ date('H:i:s') }}
     </div>
 </div>
 
-<div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden ring-1 ring-slate-200/50">
-    <div class="p-10 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
-        <div>
-            <h4 class="text-sm font-black text-slate-800 tracking-[2px] uppercase">Aktivitas Terkini</h4>
-            <p class="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-widest">Sinkronisasi data real-time</p>
-        </div>
-        <div class="hidden sm:block">
-            <span class="px-4 py-1.5 bg-violet-50 text-violet-600 text-[10px] font-black rounded-lg border border-violet-100 uppercase tracking-widest">
-                {{ $logs->count() }} Entri Log
-            </span>
-        </div>
-    </div>
-    <div class="overflow-x-auto px-6 pb-6">
-        <table class="w-full text-left border-separate border-spacing-y-2">
-            <thead>
-                <tr>
-                    <th class="px-8 py-4 text-[11px] font-black text-slate-400 border-none uppercase tracking-[3px]">Pengguna</th>
-                    <th class="px-8 py-4 text-[11px] font-black text-slate-400 border-none uppercase tracking-[3px]">Sifat Aktivitas</th>
-                    <th class="px-8 py-4 text-[11px] font-black text-slate-400 border-none uppercase tracking-[3px]">Keterangan</th>
-                    <th class="px-8 py-4 text-[11px] font-black text-slate-400 border-none uppercase tracking-[3px]">Metode & Waktu</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($logs as $log)
-                <tr class="group hover:bg-slate-50/80 transition-all duration-300">
-                    <td class="px-8 py-5 border-y border-l border-slate-100/50 rounded-l-2xl">
-                        @if($log->user_id)
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 flex items-center justify-center bg-violet-100 text-violet-700 text-[10px] font-black border border-violet-200 rounded-xl shadow-sm">
-                                    {{ substr($log->username, 0, 1) }}
-                                </div>
-                                <span class="text-sm font-black text-slate-700 tracking-tight">{{ $log->username }}</span>
-                            </div>
-                        @else
-                            <span class="px-3 py-1 bg-slate-100 text-slate-400 text-[10px] font-black rounded-lg border border-slate-200 uppercase tracking-tighter">GUEST</span>
-                        @endif
-                    </td>
-                    <td class="px-8 py-5 border-y border-slate-100/50">
-                        @php
-                            $colorIndex = 'violet';
-                            if($log->activity == 'Login') $colorIndex = 'emerald';
-                            if($log->activity == 'Logout') $colorIndex = 'amber';
-                            if($log->activity == 'Register') $colorIndex = 'blue';
-                            if(in_array($log->activity, ['Delete', 'Destroy'])) $colorIndex = 'rose';
-                        @endphp
-                        <span class="inline-flex items-center px-3 py-1 rounded-md text-[10px] font-black bg-{{ $colorIndex }}-50 text-{{ $colorIndex }}-600 border border-{{ $colorIndex }}-100/50 uppercase tracking-widest shadow-sm shadow-{{ $colorIndex }}-100">
-                            {{ $log->activity }}
-                        </span>
-                    </td>
-                    <td class="px-8 py-5 border-y border-slate-100/50">
-                        <span class="text-sm text-slate-600 font-medium tracking-tight">{{ $log->description }}</span>
-                    </td>
-                    <td class="px-8 py-5 border-y border-r border-slate-100/50 rounded-r-2xl">
-                        <div class="text-[11px] font-black text-slate-700 tracking-tight">{{ $log->created_at->diffForHumans() }}</div>
-                        <div class="text-[9px] text-slate-400 font-bold uppercase mt-0.5 tracking-[2px] opacity-60">{{ $log->ip_address }}</div>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    @if($logs->isEmpty())
-        <div class="text-center py-24 bg-slate-50/10">
-            <svg class="mx-auto h-12 w-12 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <p class="mt-4 text-slate-300 font-black uppercase tracking-[5px] text-xs">Jejak Nihil</p>
-        </div>
-    @endif
+<div class="log-card">
+    <table id="logTable" class="display w-100">
+        <thead>
+            <tr>
+                <th>Pengguna</th>
+                <th>Aktivitas</th>
+                <th>Keterangan</th>
+                <th>Waktu</th>
+                <th>Detail</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($logs as $log)
+            <tr>
+                <td>
+                    <div class="user-pill">
+                        <div class="user-avatar">
+                            {{ strtoupper(substr($log->username ?? 'G', 0, 1)) }}
+                        </div>
+                        <div>
+                            <div style="font-weight:700; color:#1f2937;">{{ $log->username ?? 'Guest' }}</div>
+                            <div style="font-size:0.7rem; color:#9ca3af;">ID: {{ $log->user_id ?? '-' }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    @php
+                        $class = match($log->activity) {
+                            'Login' => 'badge-login',
+                            'Logout' => 'badge-logout',
+                            'Delete', 'Destroy' => 'badge-delete',
+                            'Page Access', 'Access' => 'badge-access',
+                            default => 'badge-default'
+                        };
+                    @endphp
+                    <span class="badge-log {{ $class }}">
+                        {{ $log->activity }}
+                    </span>
+                </td>
+                <td>
+                    <div style="font-weight:500; font-size:0.85rem;">{{ $log->description }}</div>
+                </td>
+                <td>
+                    <div style="font-weight:700; color:#4b5563;">{{ \Carbon\Carbon::parse($log->created_at)->diffForHumans() }}</div>
+                    <div style="font-size:0.7rem; color:#9ca3af;">{{ \Carbon\Carbon::parse($log->created_at)->format('d M Y, H:i') }}</div>
+                </td>
+                <td>
+                    <div style="font-size:0.7rem; color:#6b7280; background:#f9fafb; padding:4px 8px; border-radius:6px; border:1px solid #f3f4f6; display:inline-block;">
+                        <i class="mdi mdi-access-point me-1"></i> {{ $log->ip_address }}
+                    </div>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
 </div>
 @endsection
+
+@push('js')
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#logTable').DataTable({
+            order: [[3, 'desc']], // Sort by Time column descending
+            pageLength: 10,
+            language: {
+                search: "Cari log:",
+                lengthMenu: "Tampilkan _MENU_ entri",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ log",
+                paginate: {
+                    first: "Awal",
+                    last: "Akhir",
+                    next: "Lanjut",
+                    previous: "Kembali"
+                },
+                emptyTable: "Belum ada rekaman aktivitas."
+            }
+        });
+    });
+</script>
+@endpush

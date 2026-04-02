@@ -21,9 +21,24 @@ class ActivityLog extends Model
     ];
 
     /**
-     * Disable automatic timestamps.
+     * Get the user that owns the activity log.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * The attributes that should be cast.
      *
-     * @var bool
+     * @var array
+     */
+    protected $casts = [
+        'created_at' => 'datetime',
+    ];
+
+    /**
+     * Disable automatic timestamps.
      */
     public $timestamps = false;
 }

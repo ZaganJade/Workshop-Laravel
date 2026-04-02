@@ -2,228 +2,132 @@
 
 @section('title', 'Manajemen Wilayah')
 
-@push('css')
-<!-- Select2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2/select2.min.css" rel="stylesheet" />
-<style>
-    .wilayah-card {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-        padding: 28px;
-        margin-bottom: 24px;
-    }
-    .wilayah-card h5 {
-        font-weight: 700;
-        margin-bottom: 20px;
-        color: #1a1a2e;
-        font-size: 1.1rem;
-    }
-    .wilayah-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 28px;
-    }
-    @media (max-width: 768px) {
-        .wilayah-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-    .wilayah-input {
-        width: 100%;
-        padding: 10px 14px;
-        border: 1.5px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 0.95rem;
-        transition: border-color 0.2s;
-        outline: none;
-    }
-    .wilayah-input:focus {
-        border-color: #7c3aed;
-        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-    }
-    .wilayah-btn {
-        background: linear-gradient(135deg, #7c3aed, #6d28d9);
-        color: #fff;
-        border: none;
-        padding: 10px 22px;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        font-size: 0.95rem;
-    }
-    .wilayah-btn:hover {
-        background: linear-gradient(135deg, #6d28d9, #5b21b6);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
-    }
-    .wilayah-select {
-        width: 100%;
-        padding: 10px 14px;
-        border: 1.5px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 0.95rem;
-        background: #fafafa;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-    .wilayah-select:focus {
-        border-color: #7c3aed;
-    }
-    .wilayah-result {
-        margin-top: 16px;
-        padding: 14px;
-        background: linear-gradient(135deg, #f5f3ff, #ede9fe);
-        border-radius: 8px;
-        border-left: 4px solid #7c3aed;
-        font-size: 0.95rem;
-        color: #4c1d95;
-        min-height: 48px;
-    }
-    .wilayah-result strong {
-        display: block;
-        margin-bottom: 4px;
-        font-size: 0.85rem;
-        color: #6d28d9;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    .input-group {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 16px;
-    }
-    .input-group .wilayah-input {
-        flex: 1;
-    }
-    .label-text {
-        display: block;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: #374151;
-        font-size: 0.9rem;
-    }
-    .card-badge {
-        display: inline-block;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 16px;
-    }
-    .badge-native {
-        background: #dbeafe;
-        color: #1d4ed8;
-    }
-    .badge-select2 {
-        background: #dcfce7;
-        color: #15803d;
-    }
-
-    /* Select2 custom styling */
-    .select2-container--default .select2-selection--single {
-        height: 44px;
-        border: 1.5px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 6px 14px;
-        background: #fafafa;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: 30px;
-        color: #374151;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 42px;
-    }
-    .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background: #7c3aed;
-    }
-    .select2-dropdown {
-        border: 1.5px solid #e0e0e0;
-        border-radius: 8px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    }
-</style>
-@endpush
-
 @section('content')
 
-<div class="page-header">
-    <h3 class="page-title">
-        <span class="page-title-icon bg-gradient-primary text-white me-2">
-            <i class="mdi mdi-map-marker"></i>
-        </span>
-        Manajemen Wilayah
+<div class="modern-page-header">
+    <h3>
+        <div class="modern-header-icon">
+            <i class="mdi mdi-map-marker-radius"></i>
+        </div>
+        Simulasi Manajemen Wilayah
     </h3>
+    <div style="font-size: 0.8rem; color: #6b7280; font-weight: 600; background: #f3f4f6; padding: 6px 16px; border-radius: 50px;">
+        <i class="mdi mdi-console me-1 text-primary"></i> Client-side Simulation
+    </div>
 </div>
 
-<div class="wilayah-grid">
-
+<div class="row g-4 overflow-hidden">
     {{-- Card 1: Native Select --}}
-    <div class="wilayah-card">
-        <span class="card-badge badge-native">Native Select</span>
-        <h5><i class="mdi mdi-form-dropdown"></i> Select Wilayah</h5>
+    <div class="col-md-6">
+        <div class="card h-100 border-0 shadow-sm" style="border-radius: 20px;">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                <span class="badge bg-soft-primary text-primary px-3 py-2 font-weight-bold" style="border-radius: 8px; font-size: 0.65rem; letter-spacing: 0.5px;">NATIVE SELECT</span>
+                <i class="mdi mdi-dots-horizontal text-muted"></i>
+            </div>
+            <div class="card-body p-4 pt-3">
+                <h5 class="font-weight-bold mb-4 text-dark"><i class="mdi mdi-form-select me-2 text-primary"></i>Input & Pilih Wilayah</h5>
+                
+                <div class="form-group mb-4">
+                    <label class="text-xs font-weight-bold text-uppercase text-muted mb-2 d-block" style="letter-spacing: 1px;">Tambah Wilayah Baru</label>
+                    <div class="input-group">
+                        <input type="text" id="inputWilayah1" class="form-control" placeholder="Masukkan nama wilayah..." 
+                               style="border-radius: 12px 0 0 12px; padding: 12px 18px; border: 2px solid #f1f5f9; background: #f8fafc;">
+                        <button type="button" id="btnTambah1" class="btn btn-gradient-primary font-weight-bold px-4" style="border-radius: 0 12px 12px 0;">
+                            <i class="mdi mdi-plus"></i>
+                        </button>
+                    </div>
+                </div>
 
-        <label class="label-text" for="inputWilayah1">Nama Wilayah</label>
-        <div class="input-group">
-            <input type="text" id="inputWilayah1" class="wilayah-input" placeholder="Masukkan nama wilayah...">
-            <button type="button" id="btnTambah1" class="wilayah-btn">
-                <i class="mdi mdi-plus"></i> Tambahkan
-            </button>
-        </div>
+                <div class="form-group mb-4">
+                    <label class="text-xs font-weight-bold text-uppercase text-muted mb-2 d-block" style="letter-spacing: 1px;">Daftar Wilayah</label>
+                    <select id="selectWilayah1" class="form-select" style="border-radius: 12px; padding: 12px 18px; border: 2px solid #f1f5f9; background: #f8fafc;">
+                        <option value="">-- Pilih Wilayah --</option>
+                    </select>
+                </div>
 
-        <label class="label-text" for="selectWilayah1">Pilih Wilayah</label>
-        <select id="selectWilayah1" class="wilayah-select">
-            <option value="">-- Pilih Wilayah --</option>
-        </select>
-
-        <div class="wilayah-result">
-            <strong>Wilayah Terpilih</strong>
-            <span id="hasilWilayah1">-</span>
+                <div class="mt-4 p-4" style="background: linear-gradient(135deg, #f8fafc, #f1f5f9); border-radius: 16px; border-left: 4px solid var(--primary-indigo);">
+                    <small class="text-uppercase font-weight-bold text-muted mb-1 d-block" style="font-size: 0.6rem; letter-spacing: 1px;">Hasil Seleksi</small>
+                    <div class="h5 font-weight-bold mb-0 text-dark" id="hasilWilayah1">-</div>
+                </div>
+            </div>
         </div>
     </div>
 
     {{-- Card 2: Select2 --}}
-    <div class="wilayah-card">
-        <span class="card-badge badge-select2">Select2</span>
-        <h5><i class="mdi mdi-form-select"></i> Select2 Wilayah</h5>
+    <div class="col-md-6">
+        <div class="card h-100 border-0 shadow-sm" style="border-radius: 20px;">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                <span class="badge bg-soft-success text-success px-3 py-2 font-weight-bold" style="border-radius: 8px; font-size: 0.65rem; letter-spacing: 0.5px;">SELECT2 JQUERY</span>
+                <i class="mdi mdi-dots-horizontal text-muted"></i>
+            </div>
+            <div class="card-body p-4 pt-3">
+                <h5 class="font-weight-bold mb-4 text-dark"><i class="mdi mdi-layers-outline me-2 text-success"></i>Advanced Wilayah Search</h5>
+                
+                <div class="form-group mb-4">
+                    <label class="text-xs font-weight-bold text-uppercase text-muted mb-2 d-block" style="letter-spacing: 1px;">Registrasi Nama Lokasi</label>
+                    <div class="input-group">
+                        <input type="text" id="inputWilayah2" class="form-control" placeholder="Ketik nama lokasi..." 
+                               style="border-radius: 12px 0 0 12px; padding: 12px 18px; border: 2px solid #f1f5f9; background: #f8fafc;">
+                        <button type="button" id="btnTambah2" class="btn btn-success text-white font-weight-bold px-4" style="border-radius: 0 12px 12px 0;">
+                            <i class="mdi mdi-playlist-plus"></i>
+                        </button>
+                    </div>
+                </div>
 
-        <label class="label-text" for="inputWilayah2">Nama Wilayah</label>
-        <div class="input-group">
-            <input type="text" id="inputWilayah2" class="wilayah-input" placeholder="Masukkan nama wilayah...">
-            <button type="button" id="btnTambah2" class="wilayah-btn">
-                <i class="mdi mdi-plus"></i> Tambahkan
-            </button>
-        </div>
+                <div class="form-group mb-4">
+                    <label class="text-xs font-weight-bold text-uppercase text-muted mb-2 d-block" style="letter-spacing: 1px;">Pencarian Pintar</label>
+                    <select id="selectWilayah2" class="form-select" style="width: 100%;">
+                        <option value="">-- Pilih Wilayah --</option>
+                    </select>
+                </div>
 
-        <label class="label-text" for="selectWilayah2">Pilih Wilayah</label>
-        <select id="selectWilayah2" class="wilayah-select" style="width: 100%;">
-            <option value="">-- Pilih Wilayah --</option>
-        </select>
-
-        <div class="wilayah-result">
-            <strong>Wilayah Terpilih</strong>
-            <span id="hasilWilayah2">-</span>
+                <div class="mt-4 p-4" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-radius: 16px; border-left: 4px solid #22c55e;">
+                    <small class="text-uppercase font-weight-bold text-success mb-1 d-block" style="font-size: 0.6rem; letter-spacing: 1px;">Lokasi Terkunci</small>
+                    <div class="h5 font-weight-bold mb-0 text-dark" id="hasilWilayah2">-</div>
+                </div>
+            </div>
         </div>
     </div>
-
 </div>
 
+<style>
+    .bg-soft-primary { background-color: #eef2ff !important; }
+    .bg-soft-success { background-color: #f0fdf4 !important; }
+    
+    /* Select2 Skinning */
+    .select2-container--default .select2-selection--single {
+        height: 50px !important;
+        border: 2px solid #f1f5f9 !important;
+        border-radius: 12px !important;
+        background-color: #f8fafc !important;
+        padding: 10px 14px !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #334155 !important;
+        line-height: 28px !important;
+        font-weight: 500 !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 48px !important;
+        right: 10px !important;
+    }
+    .select2-dropdown {
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+        overflow: hidden !important;
+    }
+</style>
 @endsection
 
 @push('js')
-<!-- jQuery CDN -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<!-- Select2 JS -->
+<!-- Select2 CSS/JS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
 $(document).ready(function() {
-
-    // Card 1: Native Select
+    // Card 1: Native Select logic
     $('#btnTambah1').click(function() {
         let wilayah = $('#inputWilayah1').val().trim();
         if (wilayah !== '') {
@@ -233,10 +137,10 @@ $(document).ready(function() {
     });
 
     $('#selectWilayah1').change(function() {
-        $('#hasilWilayah1').text($(this).val());
+        $('#hasilWilayah1').hide().text($(this).val() || '-').fadeIn();
     });
 
-    // Card 2: Select2
+    // Card 2: Select2 logic
     $('#selectWilayah2').select2({
         placeholder: '-- Pilih Wilayah --',
         allowClear: true
@@ -251,17 +155,17 @@ $(document).ready(function() {
     });
 
     $('#selectWilayah2').change(function() {
-        $('#hasilWilayah2').text($(this).val());
+        $('#hasilWilayah2').hide().text($(this).val() || '-').fadeIn();
     });
 
     // Enter key support
-    $('#inputWilayah1').keypress(function(e) {
-        if (e.which === 13) $('#btnTambah1').click();
+    $('#inputWilayah1, #inputWilayah2').keypress(function(e) {
+        if (e.which === 13) {
+            let id = $(this).attr('id');
+            if (id === 'inputWilayah1') $('#btnTambah1').click();
+            else $('#btnTambah2').click();
+        }
     });
-    $('#inputWilayah2').keypress(function(e) {
-        if (e.which === 13) $('#btnTambah2').click();
-    });
-
 });
 </script>
 @endpush
