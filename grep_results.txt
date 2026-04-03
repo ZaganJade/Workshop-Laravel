@@ -1,0 +1,4 @@
+resources/views/admin/tambah-barang/index-datatables.blade.php:127:        if (nama === '' || harga === '') return;
+resources/views/admin/tambah-barang/tambah_barang-index.blade.php:116:        if (nama === '' || harga === '') return;
+resources/views/admin/wilayah/wilayah.blade.php:140:        $('#hasilWilayah1').hide().text($(this).val() || '-').fadeIn();
+resources/views/admin/wilayah/wilayah.blade.php:158:        $('#hasilWilayah2').hide().text($(this).val() || '-').fadeIn();

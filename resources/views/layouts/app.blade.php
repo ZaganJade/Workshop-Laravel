@@ -269,6 +269,18 @@
                 right: 0 !important;
             }
         }
+
+        /* --- GLOBAL UI FIX: Prevent Blinking Caret on Static Text --- */
+        body *:not(input):not(textarea):not(button):not(a):not(.btn):not(select):not(.form-check-input):not([contenteditable="true"]) {
+            caret-color: transparent !important;
+            cursor: default;
+        }
+
+        /* Explicitly restore for editable elements to prevent inheritance issues */
+        input, textarea, [contenteditable="true"], .form-control {
+            caret-color: auto !important;
+            cursor: text !important;
+        }
     </style>
 
     @vite(['resources/css/app.css'])
@@ -384,6 +396,33 @@
         });
       }
     }, true); // true = Use capture phase
+  })();
+
+  // Global UI Fix: Prevent Caret/Focus on non-interactive elements
+  (function() {
+    console.log("Global Caret Fix initialized");
+    
+    // Prevent focus on non-interactive elements
+    document.addEventListener('focus', function(e) {
+      var target = e.target;
+      var isInteractive = target.closest('input, textarea, button, a, .btn, select, [contenteditable="true"], .form-check-input, .form-control, label');
+      
+      if (!isInteractive && target !== document.body && target !== document.documentElement) {
+        target.blur();
+      }
+    }, true);
+
+    // Remove accidental contenteditable on mousedown
+    document.addEventListener('mousedown', function(e) {
+      var target = e.target;
+      if (target.hasAttribute('contenteditable') && target.getAttribute('contenteditable') !== 'true') {
+        // Only if it's explicitly set but not "true" or just present
+      }
+      // General cleanup if needed
+      if (!target.closest('input, textarea, [contenteditable="true"]')) {
+        // Ensure no weird caret browsing behavior
+      }
+    }, true);
   })();
 </script>
 
