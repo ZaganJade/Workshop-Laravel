@@ -35,9 +35,19 @@ class CheckLoginMiddleware
         $timeout = 3600;
 
         if (time() - $lastActivity > $timeout) {
-            $request->session()->forget(['user_id', 'username', 'last_activity']);
-            Auth::logout();
-            return redirect()->route('login')->with('error', 'Session expired due to inactivity.');
+            // Check if the user is still rememberable before logging out
+            if (Auth::check()) {
+                $user = Auth::user();
+                $request->session()->put([
+                    'user_id' => $user->id,
+                    'username' => $user->username,
+                    'last_activity' => time()
+                ]);
+            } else {
+                $request->session()->forget(['user_id', 'username', 'last_activity']);
+                Auth::logout();
+                return redirect()->route('login')->with('error', 'Session expired due to inactivity.');
+            }
         }
 
         $request->session()->put('last_activity', time());

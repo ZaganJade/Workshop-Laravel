@@ -63,6 +63,7 @@ class AuthController extends Controller
             Mail::to($user->email)->send(new OtpMail($otp));
             
             session(['otp_user_id' => $user->id]);
+            session(['otp_remember' => $request->boolean('remember')]);
             
             return redirect()->route('auth.otp.form');
         }

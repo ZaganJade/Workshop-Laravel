@@ -16,6 +16,14 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
 
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    {{-- AOS CSS --}}
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
     <style>
         :root {
             --primary-indigo: #4f46e5;
@@ -23,84 +31,96 @@
             --glass-bg: rgba(255, 255, 255, 0.85);
             --content-bg: #f8fafc;
             --sidebar-width: 260px;
+            --navbar-height: 70px;
         }
 
         body {
-            background-color: var(--content-bg);
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Outfit', sans-serif;
             -webkit-font-smoothing: antialiased;
+            background-color: #f8fafc;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(124, 58, 237, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 204, 112, 0.03) 0px, transparent 50%);
+            background-attachment: fixed;
         }
 
         .container-scroller {
-            background-color: var(--content-bg);
+            background: transparent !important;
         }
 
         .page-body-wrapper {
-            padding-top: 70px !important;
-            min-height: calc(100vh - 70px);
-            background-color: var(--content-bg);
+            padding-top: var(--navbar-height) !important;
+            min-height: calc(100vh - var(--navbar-height));
+            background: transparent !important;
+            position: relative;
         }
 
         .main-panel {
-            background-color: var(--content-bg);
+            background: transparent !important;
             transition: all 0.3s ease;
         }
 
         .content-wrapper {
-            padding: 2.5rem 2rem !important;
+            padding: 1.5rem 1.5rem !important;
             background: transparent !important;
+            width: 100% !important;
         }
 
         /* Modern Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { 
-            background: #e2e8f0; 
+            background: #cbd5e1; 
             border-radius: 10px;
-            border: 2px solid transparent;
+            border: 3px solid transparent;
             background-clip: content-box;
         }
-        ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         /* Global Card Styling Overrides */
         .card {
-            border: 1px solid rgba(226, 232, 240, 0.6) !important;
-            border-radius: 20px !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+            background: rgba(255, 255, 255, 0.8) !important;
+            backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.5) !important;
+            border-radius: 24px !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05) !important;
             overflow: hidden !important;
         }
 
         /* --- MODERN PAGE HEADER --- */
         .modern-page-header {
-            background: white;
+            background: rgba(255, 255, 255, 0.8) !important;
+            backdrop-filter: blur(20px) !important;
             padding: 24px 30px;
-            border-radius: 20px;
+            border-radius: 24px;
             margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            border: 1px solid rgba(255, 255, 255, 0.6);
         }
         .modern-page-header h3 {
-            font-weight: 800;
+            font-weight: 900;
             margin: 0;
-            color: #1f2937;
+            color: #1e293b;
             font-size: 1.5rem;
             display: flex;
             align-items: center;
             gap: 12px;
+            letter-spacing: -0.02em;
         }
         .modern-header-icon {
-            width: 42px;
-            height: 42px;
+            width: 46px;
+            height: 46px;
             background: linear-gradient(135deg, var(--primary-indigo), var(--primary-violet));
             color: white;
-            border-radius: 12px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.25);
             font-size: 1.25rem;
         }
 
@@ -151,6 +171,17 @@
 
         .navbar.fixed-top {
             z-index: 1030;
+            height: var(--navbar-height) !important;
+            transition: none !important;
+        }
+
+        .navbar .dropdown-menu {
+            display: none !important;
+        }
+        
+        .navbar .dropdown-menu.show, 
+        .navbar .dropdown-menu.manual-show {
+            display: block !important;
         }
 
         /* --- GLOBAL SIDEBAR OVERRIDES --- */

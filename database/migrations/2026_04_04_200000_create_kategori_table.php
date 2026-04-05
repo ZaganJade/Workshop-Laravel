@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->rememberToken()->after('password');
+        Schema::create('kategori', function (Blueprint $table) {
+            $table->id('idkategori');
+            $table->string('nama_kategori');
         });
     }
 
@@ -21,8 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropRememberToken();
-        });
+        Schema::dropIfExists('kategori');
     }
 };

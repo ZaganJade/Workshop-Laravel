@@ -89,6 +89,8 @@
             <div class="dropdown-divider" style="margin: 0;"></div>
             <a class="dropdown-item py-3 px-4" href="{{ route('admin.logs.index') }}">
               <i class="mdi mdi-cached me-3 text-success"></i> Log Aktivitas </a>
+            <a class="dropdown-item py-3 px-4" href="{{ route('auth.google.switch') }}">
+              <i class="mdi mdi-account-switch me-3 text-info"></i> Ganti Akun </a>
             <a class="dropdown-item py-3 px-4" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
               <i class="mdi mdi-logout me-3 text-danger"></i> Keluar </a>
             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">

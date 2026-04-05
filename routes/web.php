@@ -11,12 +11,22 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\Chatbot\ChatController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\MidtransController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index']);
 
 // Chatbot Route
 Route::post('/chatbot/chat', [ChatController::class, 'chat'])->name('chatbot.chat');
+
+// POS & Midtrans Routes
+Route::get('/pos', [PaymentController::class, 'index'])->name('pos');
+Route::get('/menus/{idvendor}', [PaymentController::class, 'getMenusByVendor']);
+Route::post('/order', [PaymentController::class, 'createOrder']);
+Route::get('/snap-token/{id}', [PaymentController::class, 'getSnapToken']);
+Route::get('/payment/success/{id}', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
+Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
 
 Auth::routes();
 
@@ -28,6 +38,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Google OAuth Auth Routes
 Route::get('/auth/google', [OauthGoogleHandlerController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/switch', [OauthGoogleHandlerController::class, 'switchAccount'])->name('auth.google.switch');
 Route::get('/auth/google/callback', [OauthGoogleHandlerController::class, 'handleGoogleCallback']);
 
 // OTP Routes

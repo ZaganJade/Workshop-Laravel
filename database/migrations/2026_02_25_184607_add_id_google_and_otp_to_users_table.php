@@ -12,6 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->string('username', 256)->nullable()->after('name');
+            $table->string('status')->default('pending')->after('password');
             $table->string('id_google', 256)->nullable();
             $table->string('otp', 6)->nullable();
         });

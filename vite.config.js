@@ -14,4 +14,10 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    server: {
+        host: true,
+        hmr: {
+            host: process.env.VITE_HMR_HOST || 'localhost',
+        },
+    },
 });

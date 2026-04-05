@@ -45,7 +45,7 @@ class OtpHandlerController extends Controller
         $user->otp = null;
         $user->save();
 
-        Auth::login($user);
+        Auth::login($user, session('otp_remember', false));
         $request->session()->regenerate();
 
         session([
