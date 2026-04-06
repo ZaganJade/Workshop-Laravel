@@ -33,7 +33,7 @@
                                     <td class="tnj-cell text-center cursor-pointer transition-all"
                                         data-x="{{ $c }}" data-y="{{ $r }}"
                                         style="height: 35px; width: 20%; padding: 0; vertical-align: middle; font-size: 0.6rem; cursor: pointer;">
-                                        {{ $c }},{{ $r }}
+                                        <span class="cell-label">{{ $c }},{{ $r }}</span>
                                     </td>
                                     @endfor
                                 </tr>

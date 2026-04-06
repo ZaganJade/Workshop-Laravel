@@ -36,6 +36,7 @@ class BukuSeeder extends Seeder
             ['kode' => 'B018', 'judul' => 'Thinking, Fast and Slow', 'pengarang' => 'Daniel Kahneman', 'idkategori' => 5],
             ['kode' => 'B019', 'judul' => 'Atomic Habits', 'pengarang' => 'James Clear', 'idkategori' => 5],
             ['kode' => 'B020', 'judul' => 'Deep Work', 'pengarang' => 'Cal Newport', 'idkategori' => 5],
+            ['kode' => 'B021', 'judul' => 'Leonardo da Vinci', 'pengarang' => 'Walter Isaacson', 'idkategori' => 4],
         ];
 
         DB::table('buku')->insert($books);

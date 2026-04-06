@@ -1,33 +1,46 @@
 
 function openScopedModal(modalId) {
     const overlay = document.getElementById('scopedModalOverlay');
-    const modal = document.getElementById(modalId);
+    const modalEl = document.getElementById(modalId);
 
-    if (overlay && modal) {
+    if (overlay && modalEl) {
         overlay.classList.remove('hidden');
         overlay.classList.add('flex');
 
-        modal.classList.remove('hidden');
+        modalEl.classList.remove('hidden');
         setTimeout(() => {
-            modal.classList.remove('scale-95', 'opacity-0');
-            modal.classList.add('scale-100', 'opacity-100');
+            modalEl.classList.remove('scale-95', 'opacity-0');
+            modalEl.classList.add('scale-100', 'opacity-100');
         }, 10);
+    } else if (modalEl && typeof bootstrap !== 'undefined') {
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
     }
 }
 
 function closeScopedModal(modalId) {
     const overlay = document.getElementById('scopedModalOverlay');
-    const modal = document.getElementById(modalId);
+    const modalEl = document.getElementById(modalId);
 
-    if (overlay && modal) {
-        modal.classList.remove('scale-100', 'opacity-100');
-        modal.classList.add('scale-95', 'opacity-0');
+    if (overlay && modalEl) {
+        modalEl.classList.remove('scale-100', 'opacity-100');
+        modalEl.classList.add('scale-95', 'opacity-0');
 
         setTimeout(() => {
-            modal.classList.add('hidden');
+            modalEl.classList.add('hidden');
             overlay.classList.add('hidden');
             overlay.classList.remove('flex');
         }, 300);
+    } else if (modalEl && typeof bootstrap !== 'undefined') {
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) {
+            modal.hide();
+        } else {
+            // Force hide if no instance
+            modalEl.classList.add('hidden');
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.remove();
+        }
     }
 }
 
@@ -90,15 +103,19 @@ function renderTable() {
             document.getElementById('edit_id').value = item.id;
             document.getElementById('edit_nama').value = item.nama;
             document.getElementById('edit_harga').value = item.harga;
-            openScopedModal('modalEditBarang');
+            if (typeof openModal === 'function') {
+                openModal('modalEditBarang');
+            } else {
+                openScopedModal('modalEditBarang');
+            }
         });
 
         tbody.appendChild(tr);
     });
 
-    // Re-bind checkbox listeners for new rows
-    rebindCheckboxes();
+    // Re-bind listeners (using delegation now, so no action needed here, but update count)
     updateItemCount();
+    updatePrintButton();
 }
 
 // ================================
@@ -224,15 +241,28 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentX = 1;
     let currentY = 1;
 
-    // ================================
-    // Checkbox Logic (for both server & JS rows)
-    // ================================
-    rebindCheckboxes();
+    const tableBody = document.getElementById('barangTableBody');
+    if (tableBody) {
+        tableBody.addEventListener('change', function (e) {
+            if (e.target.classList.contains('barang-checkbox')) {
+                updatePrintButton();
+                
+                const allCbs = tableBody.querySelectorAll('.barang-checkbox');
+                const checkedCount = tableBody.querySelectorAll('.barang-checkbox:checked').length;
+                const selectAll = document.getElementById('selectAll');
+                if (selectAll) {
+                    selectAll.checked = checkedCount > 0 && checkedCount === allCbs.length;
+                    selectAll.indeterminate = checkedCount > 0 && checkedCount < allCbs.length;
+                }
+            }
+        });
+    }
 
     const selectAll = document.getElementById('selectAll');
     if (selectAll) {
         selectAll.addEventListener('change', function () {
-            document.querySelectorAll('.barang-checkbox').forEach(cb => {
+            const allCbs = document.querySelectorAll('.barang-checkbox');
+            allCbs.forEach(cb => {
                 cb.checked = this.checked;
             });
             updatePrintButton();
@@ -259,7 +289,11 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             highlightGrid(currentX, currentY);
-            openScopedModal('modalPrintTnj');
+            if (typeof openModal === 'function') {
+                openModal('modalPrintTnj');
+            } else {
+                openScopedModal('modalPrintTnj');
+            }
         });
     }
 
@@ -279,13 +313,15 @@ document.addEventListener('DOMContentLoaded', function () {
             cell.style.backgroundColor = '';
             cell.style.color = '#94a3b8';
             cell.style.fontWeight = '';
-            cell.querySelector('.cell-label').textContent = cellX + ',' + cellY;
+            const label = cell.querySelector('.cell-label');
+            if (label) label.textContent = cellX + ',' + cellY;
 
             if (cellX === x && cellY === y) {
                 cell.style.backgroundColor = '#059669';
                 cell.style.color = '#ffffff';
                 cell.style.fontWeight = '900';
-                cell.querySelector('.cell-label').textContent = '▶ START';
+                const label = cell.querySelector('.cell-label');
+                if (label) label.textContent = '▶ START';
             } else if (cellIndex >= startIndex && cellIndex < startIndex + itemCount) {
                 cell.style.backgroundColor = '#d1fae5';
                 cell.style.color = '#065f46';
@@ -294,20 +330,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 const dataIndex = cellIndex - startIndex;
                 if (dataIndex < itemCount) {
                     const nama = checkedItems[dataIndex].getAttribute('data-nama');
-                    cell.querySelector('.cell-label').textContent = nama.length > 6 ? nama.substring(0, 5) + '…' : nama;
+                    const label = cell.querySelector('.cell-label');
+                    if (label) label.textContent = nama.length > 6 ? nama.substring(0, 5) + '…' : nama;
                 }
             } else if (cellIndex < startIndex) {
                 cell.style.backgroundColor = '#f8fafc';
                 cell.style.color = '#cbd5e1';
-                cell.querySelector('.cell-label').textContent = '—';
+                const label = cell.querySelector('.cell-label');
+                if (label) label.textContent = '—';
             }
         });
 
-        inputX.value = x;
-        inputY.value = y;
-        displayX.textContent = x;
-        displayY.textContent = y;
-        coordDisplay.textContent = 'X:' + x + ' Y:' + y;
+        if (inputX) inputX.value = x;
+        if (inputY) inputY.value = y;
+        if (displayX) displayX.textContent = x;
+        if (displayY) displayY.textContent = y;
+        if (coordDisplay) coordDisplay.textContent = 'X:' + x + ' Y:' + y;
     }
 
     tnjCells.forEach(cell => {
@@ -347,24 +385,9 @@ document.addEventListener('DOMContentLoaded', function () {
 // ================================
 // Checkbox Rebind Helper
 // ================================
-function rebindCheckboxes() {
-    document.querySelectorAll('.barang-checkbox').forEach(cb => {
-        // Remove old listeners by cloning
-        const newCb = cb.cloneNode(true);
-        cb.parentNode.replaceChild(newCb, cb);
-
-        newCb.addEventListener('change', () => {
-            updatePrintButton();
-            const allCbs = document.querySelectorAll('.barang-checkbox');
-            const checkedCount = document.querySelectorAll('.barang-checkbox:checked').length;
-            const selectAll = document.getElementById('selectAll');
-            if (selectAll) {
-                selectAll.checked = checkedCount === allCbs.length;
-                selectAll.indeterminate = checkedCount > 0 && checkedCount < allCbs.length;
-            }
-        });
-    });
-}
+// ================================
+// Checkbox delegation logic is now handled in DOMContentLoaded
+// ================================
 
 function updatePrintButton() {
     const btnPrint = document.getElementById('btnPrintTnj');
