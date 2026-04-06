@@ -38,28 +38,65 @@
           </a>
         </li>
 
-        {{-- Notifications Placeholder (Simplified) --}}
+        {{-- Notifications for Pending Orders (Hybrid: Guest + User) --}}
+        @php
+            $pendingCount = 0;
+            $recentPending = collect();
+            $guestOrderIds = session()->get('guest_orders', []);
+            
+            $query = \App\Models\Pesanan::where('status_bayar', 'menunggu');
+            
+            if(auth()->check()) {
+                $userId = auth()->id();
+                $query->where(function($q) use ($userId, $guestOrderIds) {
+                    $q->where('user_id', $userId)
+                      ->orWhereIn('idpesanan', $guestOrderIds);
+                });
+            } else {
+                if(!empty($guestOrderIds)) {
+                    $query->whereIn('idpesanan', $guestOrderIds);
+                } else {
+                    $query->whereRaw('1=0'); // Force empty if no guest orders
+                }
+            }
+
+            $pendingCount = (clone $query)->count();
+            $recentPending = $query->with('payment')->latest()->take(3)->get();
+        @endphp
         <li class="nav-item dropdown ms-1">
           <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-bs-toggle="dropdown" style="color: #64748b;">
             <i class="mdi mdi-bell-outline" style="font-size: 1.4rem;"></i>
-            <span class="count-symbol" style="background: #ef4444; width: 8px; height: 8px; top: 18px; right: 8px;"></span>
+            @if($pendingCount > 0)
+              <span class="count-symbol" style="background: #ef4444; width: 8px; height: 8px; top: 18px; right: 8px;"></span>
+            @endif
           </a>
-          <div class="dropdown-menu dropdown-menu-end navbar-dropdown preview-list shadow-lg border-0" aria-labelledby="notificationDropdown" style="border-radius: 16px; margin-top: 10px; width: 300px;">
+          <div class="dropdown-menu dropdown-menu-end navbar-dropdown preview-list shadow-lg border-0" aria-labelledby="notificationDropdown" style="border-radius: 16px; margin-top: 10px; width: 320px;">
             <h6 class="p-3 mb-0" style="font-weight: 700; font-size: 0.9rem;">Notifikasi</h6>
             <div class="dropdown-divider" style="margin: 0;"></div>
-            <a class="dropdown-item preview-item p-3">
-              <div class="preview-thumbnail">
-                <div class="preview-icon rounded-circle d-flex align-items-center justify-content-center" style="background: #ecfdf5; color: #10b981; width: 36px; height: 36px;">
-                  <i class="mdi mdi-calendar"></i>
-                </div>
+            
+            @if($pendingCount > 0)
+              @foreach($recentPending as $pesanan)
+                <a class="dropdown-item preview-item p-3" href="{{ route('pesanan.pending') }}">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon rounded-circle d-flex align-items-center justify-content-center" style="background: #fff7ed; color: #f97316; width: 36px; height: 36px;">
+                      <i class="mdi mdi-cash-clock"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
+                    <h6 class="preview-subject font-weight-bold mb-1" style="font-size: 0.85rem;">Pesanan Tertunda</h6>
+                    <p class="text-muted mb-0" style="font-size: 0.75rem;">ID: #{{ $pesanan->idpesanan }} - Rp {{ number_format($pesanan->total, 0, ',', '.') }}</p>
+                  </div>
+                </a>
+                <div class="dropdown-divider" style="margin: 0;"></div>
+              @endforeach
+            @else
+              <div class="p-4 text-center text-muted" style="font-size: 0.8rem;">
+                <i class="mdi mdi-check-circle-outline d-block mb-2" style="font-size: 2rem; color: #10b981;"></i>
+                Semua pesanan sudah dibayar!
               </div>
-              <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
-                <h6 class="preview-subject font-weight-bold mb-1" style="font-size: 0.85rem;">System Update</h6>
-                <p class="text-muted mb-0" style="font-size: 0.75rem;">Dashboard baru telah diaktifkan!</p>
-              </div>
-            </a>
-            <div class="dropdown-divider" style="margin: 0;"></div>
-            <h6 class="p-3 mb-0 text-center" style="font-size: 0.75rem; color: var(--primary-indigo); font-weight: 600; cursor: pointer;">Lihat Semua</h6>
+            @endif
+
+            <a class="p-3 mb-0 text-center d-block" href="{{ route('pesanan.pending') }}" style="font-size: 0.75rem; color: var(--primary-indigo); font-weight: 600; cursor: pointer; text-decoration: none;">Lihat Semua Pesanan Tertunda</a>
           </div>
         </li>
 

@@ -11,9 +11,31 @@
             <div class="absolute -top-10 -right-10 w-40 h-40 bg-indigo-600/5 rounded-full blur-3xl group-hover:bg-indigo-600/10 transition-all duration-700"></div>
             
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-8 sticky top-0 bg-white/20 backdrop-blur-md z-10 py-4 -mx-4 px-4 rounded-2xl">
-                <div>
-                    <h2 class="text-4xl font-black text-slate-900 tracking-tighter leading-none mb-3 italic">Daftar <span class="text-indigo-600">Menu.</span></h2>
-                    <p class="text-sm text-slate-400 font-bold uppercase tracking-widest">Pilih vendor favoritmu untuk mengeksplorasi hidangan.</p>
+                <div class="flex items-center gap-6">
+                    <div>
+                        <h2 class="text-4xl font-black text-slate-900 tracking-tighter leading-none mb-3 italic">Daftar <span class="text-indigo-600">Menu.</span></h2>
+                        <p class="text-sm text-slate-400 font-bold uppercase tracking-widest">Pilih vendor favoritmu untuk mengeksplorasi hidangan.</p>
+                    </div>
+                    
+                    {{-- Hybrid Pending Orders Button for Guests & Members --}}
+                    @php
+                        $guestOrderIds = session()->get('guest_orders', []);
+                        $pendingCount = \App\Models\Pesanan::where('status_bayar', 'menunggu')
+                            ->where(function($q) use ($guestOrderIds) {
+                                if(auth()->check()) $q->where('user_id', auth()->id())->orWhereIn('idpesanan', $guestOrderIds);
+                                else $q->whereIn('idpesanan', $guestOrderIds);
+                            })->count();
+                    @endphp
+
+                    @if($pendingCount > 0)
+                    <a href="{{ route('pesanan.pending') }}" class="group relative flex items-center gap-3 px-6 py-4 bg-orange-50 text-orange-600 rounded-2xl border border-orange-100 hover:bg-orange-600 hover:text-white transition-all duration-500 shadow-sm active:scale-95">
+                        <i class="fas fa-clock-rotate-left text-lg"></i>
+                        <span class="text-xs font-black uppercase tracking-widest italic">Pesanan Tertunda</span>
+                        <span class="absolute -top-3 -right-3 w-8 h-8 bg-orange-600 text-white rounded-full flex items-center justify-center text-[10px] font-black border-2 border-white shadow-xl group-hover:scale-110 transition-transform">
+                            {{ $pendingCount }}
+                        </span>
+                    </a>
+                    @endif
                 </div>
                 <div class="relative w-full md:w-80 group">
                     <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-indigo-400 group-hover:scale-110 transition-transform">

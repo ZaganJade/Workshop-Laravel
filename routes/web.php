@@ -26,6 +26,7 @@ Route::get('/menus/{idvendor}', [PaymentController::class, 'getMenusByVendor']);
 Route::post('/order', [PaymentController::class, 'createOrder']);
 Route::get('/snap-token/{id}', [PaymentController::class, 'getSnapToken']);
 Route::get('/payment/success/{id}', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
+Route::get('/pesanan/pending', [PaymentController::class, 'pendingOrders'])->name('pesanan.pending');
 Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
 
 Auth::routes();

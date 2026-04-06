@@ -115,7 +115,7 @@
                 </div>
 
                 <div class="flex items-center gap-8">
-                    @auth
+                    @if(Auth::check())
                         <div class="hidden md:flex flex-col text-right">
                              <p class="text-xs font-black text-indigo-500 uppercase tracking-widest mb-1 italic">Selamat Datang,</p>
                             <p class="text-sm font-black text-slate-800 tracking-tight">{{ Auth::user()->name }}</p>
@@ -123,7 +123,15 @@
                         <div class="w-12 h-12 rounded-2xl bg-white border-2 border-indigo-50 flex items-center justify-center text-indigo-600 font-black text-lg shadow-sm">
                             {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                         </div>
-                    @endauth
+                    @else
+                        <div class="hidden md:flex flex-col text-right">
+                             <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1 italic">Selamat Datang,</p>
+                            <p class="text-sm font-black text-slate-600 tracking-tight">{{ session('username') ?? 'Tamu' }}</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-white border-2 border-slate-100 flex items-center justify-center text-slate-400 font-black text-lg shadow-sm">
+                            {{ strtoupper(substr(session('username') ?? 'T', 0, 1)) }}
+                        </div>
+                    @endif
                     
                     <a href="{{ url('/') }}" class="px-6 py-3 bg-white border border-slate-100 rounded-2xl text-xs font-black text-slate-400 uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all duration-500 flex items-center gap-3 active:scale-95">
                         <i class="fas fa-arrow-left text-[10px]"></i> Keluar

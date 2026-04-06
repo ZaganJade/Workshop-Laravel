@@ -18,6 +18,14 @@ class MidtransController extends Controller
      */
     public function callback(Request $request)
     {
+        // 🔥 DEBUG: Log ALL attempts to hit this endpoint
+        Log::info('Midtrans Debug: Endpoint hit', [
+            'ip' => $request->ip(),
+            'method' => $request->method(),
+            'full_url' => $request->fullUrl(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
         // 1. ENSURE WEBHOOK ALWAYS LOGS INCOMING REQUEST CLEARLY
         Log::info('Midtrans Webhook: Raw Notification Received', [
             'order_id' => $request->input('order_id'),
@@ -74,7 +82,7 @@ class MidtransController extends Controller
             return response()->json(['message' => 'Notification handled successfully']);
         }
 
-        return response()->json(['message' => 'Failed to update database'], 500);
+        return response()->json(['message' => 'Notification acknowledged but no action taken (Order not found)'], 200);
     }
 
     /**

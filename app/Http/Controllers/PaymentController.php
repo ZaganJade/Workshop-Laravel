@@ -71,6 +71,10 @@ class PaymentController extends Controller
                 ]);
             }
 
+            if (!$userId) {
+                session()->push('guest_orders', $pesanan->idpesanan);
+            }
+
             return response()->json(['idpesanan' => $pesanan->idpesanan]);
         });
     }
@@ -98,25 +102,19 @@ class PaymentController extends Controller
                 ]);
             }
 
-            // 🔥 Order ID Stabilization: Use existing order_id if available to prevent Error 900
-            $existingPayment = Payment::where('idpesanan', $id)
-                ->where('status', 'menunggu')
-                ->first();
+            /**
+             * 🔥 SANDBOX STABILITY FIX
+             * Selalu buat Order ID baru dengan suffix acak setiap kali request Snap Token.
+             * Ini mencegah error 2603 (Failed to process QR) yang sering terjadi di Sandbox
+             * jika menggunakan kembali Order ID yang sesinya sudah kadaluarsa/error.
+             */
+            $orderId = 'WP-' . $pesanan->idpesanan . '-' . time() . bin2hex(random_bytes(2));
 
-            if ($existingPayment) {
-                $orderId = $existingPayment->order_id_midtrans;
-                \Log::info('Midtrans Lifecycle: Re-using existing stable Order ID', [
-                    'order_id' => $orderId,
-                    'gross_amount' => $pesanan->total
-                ]);
-            } else {
-                // 🔥 Simplified Format: Single dash as recommended by Midtrans for Sandbox stability
-                $orderId = 'WP-' . $pesanan->idpesanan . '-' . bin2hex(random_bytes(4));
-                \Log::info('Midtrans Lifecycle: Generating new simplified Order ID', [
-                    'order_id' => $orderId,
-                    'gross_amount' => $pesanan->total
-                ]);
-            }
+            \Log::info('Midtrans Lifecycle: Generating fresh Order ID for payment session', [
+                'idpesanan' => $id,
+                'order_id' => $orderId,
+                'gross_amount' => $pesanan->total
+            ]);
 
             // Ensure Server Key is set
             if (empty(Config::$serverKey) || Config::$serverKey == 'SB-Mid-server-xxxxxxxxxxxx') {
@@ -135,6 +133,16 @@ class PaymentController extends Controller
                 ];
             }
 
+            // 🔥 Debug: Capture the exact URL sent to Midtrans
+            $notificationUrl = url('/midtrans/callback');
+            
+            \Log::info('Midtrans Debug: Notification URL Sent to Midtrans', [
+                'order_id' => $orderId,
+                'notification_url' => $notificationUrl,
+                'APP_URL' => env('APP_URL'),
+                'current_request_host' => request()->getHost()
+            ]);
+
             $params = [
                 'transaction_details' => [
                     'order_id' => $orderId,
@@ -150,7 +158,7 @@ class PaymentController extends Controller
                     'error' => route('pos'),
                     'pending' => route('payment.success', ['id' => $pesanan->idpesanan]),
                 ],
-                'notification_url' => url('/midtrans/callback'),
+                'notification_url' => $notificationUrl,
             ];
 
             // Update or Create Payment record BEFORE getting Snap Token to ensure DB integrity
@@ -169,7 +177,8 @@ class PaymentController extends Controller
                 'snap_token' => $snapToken,
                 'order_id' => $orderId,
                 'status' => 'menunggu'
-            ]);
+            ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+              ->header('Pragma', 'no-cache');
         } catch (\Exception $e) {
             \Log::error('Midtrans Lifecycle Error: ' . $e->getMessage(), [
                 'idpesanan' => $id,
@@ -186,10 +195,11 @@ class PaymentController extends Controller
         $pesanan = Pesanan::with('details.menu', 'payment')->findOrFail($id);
 
         /**
-         * 🔥 ROBUSTNESS FALLBACK
-         * If the status is still 'menunggu' in our DB, we manually check Midtrans API.
-         * This handles cases where the Webhook (Callback) failed to deliver.
+         * 🔥 ROBUSTNESS FALLBACK (DIPATIKAN/COMMENTED)
+         * Jika Anda ingin mengaktifkan sinkronisasi otomatis saat user masuk ke halaman ini,
+         * hapus tanda komentar di bawah ini.
          */
+        /*
         if ($pesanan->payment && $pesanan->payment->status == 'menunggu') {
             try {
                 $orderId = $pesanan->payment->order_id_midtrans;
@@ -198,27 +208,56 @@ class PaymentController extends Controller
                 $status = \Midtrans\Transaction::status($orderId);
                 
                 if ($status) {
+                    $statusArray = json_decode(json_encode($status), true);
                     \App\Http\Controllers\MidtransController::processStatusUpdate(
                         $orderId,
-                        $status->transaction_status,
-                        $status->fraud_status ?? null,
+                        $statusArray['transaction_status'] ?? 'pending',
+                        $statusArray['fraud_status'] ?? null,
                         [
-                            'transaction_id' => $status->transaction_id,
-                            'payment_type' => $status->payment_type,
-                            'bank' => $status->bank ?? ($status->va_numbers[0]->bank ?? null),
-                            'raw_response' => (array) $status,
+                            'transaction_id' => $statusArray['transaction_id'] ?? null,
+                            'payment_type' => $statusArray['payment_type'] ?? null,
+                            'bank' => $statusArray['bank'] ?? ($statusArray['va_numbers'][0]['bank'] ?? null),
+                            'raw_response' => $statusArray,
                         ]
                     );
                     
-                    // Refresh model to reflect changes in the view
-                    $pesanan->load('payment');
+                    // Refresh model and its relationships to reflect changes from Midtrans sync
+                    $pesanan->refresh();
                 }
             } catch (\Exception $e) {
                 // If 404 or connection error, we log it but still show the page
                 \Log::warning('Midtrans Sync Fallback: Failed to fetch status for ' . $id . '. Error: ' . $e->getMessage());
             }
         }
+        */
 
+        // The view will automatically handle showing Success vs Pending based on status_bayar
         return view('Feature-Merchant.payment_success', compact('pesanan'));
+    }
+
+    public function pendingOrders()
+    {
+        $userId = auth()->id();
+        $guestOrderIds = session()->get('guest_orders', []);
+
+        $query = Pesanan::with('payment', 'details.menu')
+            ->where('status_bayar', 'menunggu');
+
+        if ($userId) {
+            $query->where(function ($q) use ($userId, $guestOrderIds) {
+                $q->where('user_id', $userId)
+                  ->orWhereIn('idpesanan', $guestOrderIds);
+            });
+        } else {
+            if (empty($guestOrderIds)) {
+                $pesanans = collect();
+            } else {
+                $query->whereIn('idpesanan', $guestOrderIds);
+            }
+        }
+
+        $pesanans = isset($pesanans) ? $pesanans : $query->orderBy('created_at', 'desc')->get();
+
+        return view('Feature-Merchant.pending_orders', compact('pesanans'));
     }
 }
