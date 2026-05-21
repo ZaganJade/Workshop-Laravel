@@ -113,7 +113,7 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
 const CSRF_TOKEN = "{{ csrf_token() }}";
-const URL = {
+const NFC_URL = {
     store:       "{{ route('admin.nfc.mahasiswa.store') }}",
     update:      (id) => `{{ url('admin/nfc/mahasiswa') }}/${id}`,
     destroy:     (id) => `{{ url('admin/nfc/mahasiswa') }}/${id}`,
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = tr.dataset.id;
             const nama = tr.dataset.nama;
             if (!confirm(`Hapus mahasiswa "${nama}"?`)) return;
-            axios.delete(URL.destroy(id))
+            axios.delete(NFC_URL.destroy(id))
                 .then(() => { alert('Mahasiswa dihapus'); location.reload(); })
                 .catch(err => alert('Gagal hapus: ' + (err.response?.data?.message || err.message)));
         });
@@ -194,7 +194,7 @@ async function scanKartu() {
             const serial = serialNumber.toUpperCase();
 
             try {
-                const r = await axios.get(URL.checkSerial, { params: { serial } });
+                const r = await axios.get(NFC_URL.checkSerial, { params: { serial } });
                 const d = r.data.data;
                 if (d.available === false && (!editingId || d.mahasiswa.nim !== document.getElementById('formNim').value)) {
                     status.textContent = `⚠️ Kartu ini sudah dipakai oleh: ${d.mahasiswa.nama} (${d.mahasiswa.nim})`;
@@ -229,8 +229,8 @@ function simpanForm() {
     }
 
     const req = editingId
-        ? axios.put(URL.update(editingId), payload)
-        : axios.post(URL.store, payload);
+        ? axios.put(NFC_URL.update(editingId), payload)
+        : axios.post(NFC_URL.store, payload);
 
     req.then(r => {
         alert(r.data.message);
