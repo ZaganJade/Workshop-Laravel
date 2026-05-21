@@ -93,5 +93,48 @@
           <span class="menu-title">Quick Entry</span>
         </a>
       </li>
+
+      <li class="nav-item mt-4">
+        <span style="font-size: 0.65rem; font-weight: 900; text-transform: uppercase; color: #94a3b8; padding: 0 30px; letter-spacing: 0.15em; display: block; margin-bottom: 10px;">AJAX & Axios Lab</span>
+      </li>
+
+      <li class="nav-item {{ Route::is('admin.wilayah-cascade') ? 'is-active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.wilayah-cascade') }}">
+          <i class="fas fa-diagram-project menu-icon"></i>
+          <span class="menu-title">Wilayah Cascading</span>
+        </a>
+      </li>
+
+      <li class="nav-item {{ Route::is('admin.pos-kasir') ? 'is-active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.pos-kasir') }}">
+          <i class="fas fa-cart-shopping menu-icon"></i>
+          <span class="menu-title">POS Kasir AJAX</span>
+        </a>
+      </li>
+
+      <li class="nav-item mt-4">
+        <span style="font-size: 0.65rem; font-weight: 900; text-transform: uppercase; color: #94a3b8; padding: 0 30px; letter-spacing: 0.15em; display: block; margin-bottom: 10px;">Web NFC detection</span>
+      </li>
+
+      <li class="nav-item {{ Route::is('admin.nfc.mahasiswa.*') ? 'is-active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.nfc.mahasiswa.index') }}">
+          <i class="fas fa-id-card menu-icon"></i>
+          <span class="menu-title">Daftar Mahasiswa</span>
+        </a>
+      </li>
+
+      <li class="nav-item {{ Route::is('admin.nfc.absensi') ? 'is-active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.nfc.absensi') }}">
+          <i class="fas fa-broadcast-tower menu-icon"></i>
+          <span class="menu-title">Scan Absensi</span>
+        </a>
+      </li>
+
+      <li class="nav-item {{ Route::is('admin.nfc.riwayat') ? 'is-active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.nfc.riwayat') }}">
+          <i class="fas fa-clipboard-list menu-icon"></i>
+          <span class="menu-title">Riwayat Absensi</span>
+        </a>
+      </li>
     </ul>
 </nav>
