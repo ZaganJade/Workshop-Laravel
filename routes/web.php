@@ -4,6 +4,10 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\BukuController;
+use App\Http\Controllers\Admin\NfcController;
+use App\Http\Controllers\Admin\NfcMahasiswaController;
+use App\Http\Controllers\Admin\WilayahCascadeController;
+use App\Http\Controllers\Admin\PosKasirController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\OtpHandlerController;
 use App\Http\Controllers\Auth\OauthGoogleHandlerController;
@@ -81,6 +85,22 @@ Route::middleware(['check.login'])->group(function () {
         return view('admin.wilayah.wilayah');
     })->name('admin.wilayah');
 
+    // Studi Kasus 1: Wilayah Administrasi Cascading (AJAX & Axios)
+    Route::get('/admin/wilayah-cascade', function () {
+        return view('admin.wilayah-cascade.index');
+    })->name('admin.wilayah-cascade');
+    Route::get('/admin/wilayah-cascade/provinsi',   [WilayahCascadeController::class, 'provinsi'])->name('admin.wilayah-cascade.provinsi');
+    Route::get('/admin/wilayah-cascade/kota',       [WilayahCascadeController::class, 'kota'])->name('admin.wilayah-cascade.kota');
+    Route::get('/admin/wilayah-cascade/kecamatan',  [WilayahCascadeController::class, 'kecamatan'])->name('admin.wilayah-cascade.kecamatan');
+    Route::get('/admin/wilayah-cascade/kelurahan',  [WilayahCascadeController::class, 'kelurahan'])->name('admin.wilayah-cascade.kelurahan');
+
+    // Studi Kasus 2: POS Kasir (AJAX & Axios)
+    Route::get('/admin/pos-kasir', function () {
+        return view('admin.pos-kasir.index');
+    })->name('admin.pos-kasir');
+    Route::get('/admin/pos-kasir/cari/{kode}', [PosKasirController::class, 'cari'])->name('admin.pos-kasir.cari');
+    Route::post('/admin/pos-kasir/simpan',    [PosKasirController::class, 'simpan'])->name('admin.pos-kasir.simpan');
+
     // Tambah Barang (Blade + jQuery only, no database)
     Route::get('/admin/tambah-barang/html', function () {
         return view('admin.tambah-barang.tambah_barang-index');
@@ -89,4 +109,23 @@ Route::middleware(['check.login'])->group(function () {
     Route::get('/admin/tambah-barang/datatables', function () {
         return view('admin.tambah-barang.index-datatables');
     })->name('admin.tambah-barang.datatables');
+
+    // Studi Kasus 3: Web NFC detection (Sistem Absensi Mahasiswa)
+    Route::prefix('admin/nfc')->name('admin.nfc.')->group(function () {
+        // Mahasiswa CRUD
+        Route::get   ('/mahasiswa',              [NfcMahasiswaController::class, 'index'])->name('mahasiswa.index');
+        Route::post  ('/mahasiswa',              [NfcMahasiswaController::class, 'store'])->name('mahasiswa.store');
+        Route::get   ('/mahasiswa/check-serial', [NfcMahasiswaController::class, 'checkSerial'])->name('mahasiswa.check-serial');
+        Route::put   ('/mahasiswa/{id}',         [NfcMahasiswaController::class, 'update'])->name('mahasiswa.update');
+        Route::delete('/mahasiswa/{id}',         [NfcMahasiswaController::class, 'destroy'])->name('mahasiswa.destroy');
+
+        // Scan Absensi
+        Route::get ('/absensi',       [NfcController::class, 'scanPage'])->name('absensi');
+        Route::post('/absensi/scan',  [NfcController::class, 'scan'])->name('absensi.scan');
+        Route::get ('/absensi/feed',  [NfcController::class, 'feed'])->name('absensi.feed');
+
+        // Riwayat
+        Route::get('/riwayat',      [NfcController::class, 'riwayat'])->name('riwayat');
+        Route::get('/riwayat/data', [NfcController::class, 'riwayatData'])->name('riwayat.data');
+    });
 });
